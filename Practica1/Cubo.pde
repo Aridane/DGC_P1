@@ -40,6 +40,7 @@
 class cube {
   //vertex [] vertexes = new vertex[8];
   PVector [] vertexes = new PVector[8];
+  PVector [] tVertexes = new PVector[8];
 
   cube(PVector v0, PVector v2) {
     int i = 0;
@@ -55,7 +56,7 @@ class cube {
     //vertexes[1].y = vertexes[0].y;
     //vertexes[1].z = 0;
     vertexes[2] = new PVector(vertexes[0].x + base, vertexes[0].y + base, 0);
-    
+
     vertexes[3] = new PVector(vertexes[0].x, vertexes[0].y + base, 0);
     /*vertexes[3].x = vertexes[0].x;
      vertexes[3].y = vertexes[0].y + base;
@@ -63,8 +64,9 @@ class cube {
 
     for (i=4;i<8;i++) {
       vertexes[i] = vertexes[i-4].get();
-      vertexes[i].z = base;
+      vertexes[i].z = -base;
     }
+
     for (i=0;i<8;i++) {
       println(i+" x= "+vertexes[i].x+" y= "+vertexes[i].y +" z= "+vertexes[i].z);
     }
@@ -78,17 +80,41 @@ class cube {
     }
   }
 
-  void draw() {
+  void draw(float k) {
     int i = 0;
+    for (i=0;i<8;i++) {
+      tVertexes[i] = vertexes[i].get();
+      tVertexes[i].x = tVertexes[i].x - width/2;
+      tVertexes[i].y = tVertexes[i].y - height/2;
+    }
+
+    for (i=0;i<8;i++) { 
+      tVertexes[i].x = tVertexes[i].x/(1-(tVertexes[i].z/k));
+      tVertexes[i].y = tVertexes[i].y/(1-(tVertexes[i].z/k));
+    }
+
+    for (i=0;i<8;i++) {
+      tVertexes[i].x = tVertexes[i].x + width/2;
+      tVertexes[i].y = tVertexes[i].y + height/2;
+    }
+
     for (i=0;i<4;i++) {
-      line(vertexes[i].x, vertexes[i].y, vertexes[(i+1)%4].x, vertexes[(i+1)%4].y);
-      //rect(vertexes[i+4].x, vertexes[i+4].y, vertexes[((i+1)%4)+4].x, vertexes[((i+1)%4)+4].y);
-      //rect(vertexes[i].x, vertexes[i].y, vertexes[i+4].x, vertexes[i+4].y);
+      stroke(0, 255, 0);
+      line(tVertexes[i+4].x, tVertexes[i+4].y, tVertexes[((i+1)%4)+4].x, tVertexes[((i+1)%4)+4].y);
+    }
+
+    for (i=0;i<4;i++) {
+
+      stroke(0, 0, 255);
+      line(tVertexes[i].x, tVertexes[i].y, tVertexes[i+4].x, tVertexes[i+4].y);
+    }
+
+    for (i=0;i<4;i++) {
+      stroke(0);
+      line(tVertexes[i].x, tVertexes[i].y, tVertexes[(i+1)%4].x, tVertexes[(i+1)%4].y);
     }
   }
 }
-
-
 
 
 
