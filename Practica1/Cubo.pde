@@ -36,6 +36,19 @@
  }
  }
  */
+float [][] multiplyMatrix(float v[][], float R[][], int n1, int  m1, int m2){
+  float [][] M = new float[n1][m2];
+  for (int i=0;i<n1;i++) {
+    for (int j=0;j<m2;j++) {
+      for (int k=0;k<m1;k++) {
+        M[i][j] += v[i][k] * R[k][j];
+      }
+    }
+  }
+  return M;  
+}
+
+
 
 class cube {
   //vertex [] vertexes = new vertex[8];
@@ -113,6 +126,45 @@ class cube {
       stroke(0);
       line(tVertexes[i].x, tVertexes[i].y, tVertexes[(i+1)%4].x, tVertexes[(i+1)%4].y);
     }
+  }
+  /*void translate (float x, float y, float z) {
+    
+  }*/
+  void rotateX(float angle){
+    float[][] Rx = {  {1, 0, 0, 0},
+                     {0, cos(angle), sin(angle), 0},
+                     {0, -sin(angle), cos(angle), 0},
+                     {0, 0, 0, 1}  };
+                     
+    for (int i=0;i<8;i++) {
+      //vertexes[i] = vertexes[i].get();
+      vertexes[i].x = vertexes[i].x - width/2;
+      vertexes[i].y = vertexes[i].y - height/2;
+    }
+    float [][] aux = new float[8][4];
+    
+    for(int i=0;i<8;i++){
+      aux[i][0] = vertexes[i].x;
+      aux[i][1] = vertexes[i].y;
+      aux[i][2] = vertexes[i].z;
+      aux[i][3] = 1;
+    }
+    
+    aux = multiplyMatrix(aux,Rx,8,4,4);
+    
+    for(int i=0;i<8;i++){
+      vertexes[i].x = aux[i][0];
+      vertexes[i].y = aux[i][1];
+      vertexes[i].z = aux[i][2];
+    }
+    
+    for (int i=0;i<8;i++) {
+      //vertexes[i] = vertexes[i].get();
+      vertexes[i].x = vertexes[i].x + width/2;
+      vertexes[i].y = vertexes[i].y + height/2;
+    }
+                     
+    
   }
 }
 
