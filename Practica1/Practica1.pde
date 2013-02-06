@@ -5,6 +5,8 @@ float rotateXIniX;
 float rotateXIniY;
 float rotateXWidth = 60;
 float rotateXHeight = 20;
+float iniRotX;
+float iniRotY;
 boolean rotateXPressed = false;
 
 void setup(){
@@ -29,6 +31,7 @@ void draw(){
    else fill(90,90,90);
    rect(rotateXIniX,rotateXIniY,rotateXWidth,rotateXHeight);
    fill(0);
+   text("RotX",rotateXIniX+15, rotateXIniY+15,-1);
    
    stroke(255,0,0);
    line(width/2, height/2, (width/2)+60, height/2);
@@ -42,6 +45,8 @@ void mousePressed() {
      mouseY > rotateXIniY && mouseY < rotateXIniY + rotateXHeight)
   { 
     rotateXPressed = rotateXPressed ^ true;
+    iniRotX = mouseX;
+    iniRotY = mouseY;
     if (rotateXPressed) fill(160,160,160);
     else fill(90,90,90);
     rect(rotateXIniX,rotateXIniY,rotateXWidth,rotateXHeight);
@@ -54,6 +59,8 @@ void mousePressed() {
   else if (rotateXPressed){
     iniX = mouseX;
     iniY = mouseY;
+    iniRotX = mouseX;
+    iniRotY = mouseY;
   }
   else
   {    
@@ -66,7 +73,9 @@ void mousePressed() {
 }
 
 void mouseReleased() {
-  if (!rotateXPressed){
+  if (!rotateXPressed &&  !(mouseX > rotateXIniX && mouseX < rotateXIniX + rotateXWidth &&
+     mouseY > rotateXIniY && mouseY < rotateXIniY + rotateXHeight)){
+       
     PVector v0 = new PVector(iniX, iniY, 0);
     PVector v2 = new PVector(dragX, dragY, 0);
     cube = new cube(v0, v2);
@@ -79,7 +88,7 @@ void mouseDragged() {
   dragX = mouseX;
   dragY = mouseY;
   if (rotateXPressed){
-    cube.rotateX((iniY-dragY)/100.);
+    if (cube != null) cube.rotateX((iniY-dragY)/100., iniRotX, iniRotY);
     
     draw();
     iniX = dragX;

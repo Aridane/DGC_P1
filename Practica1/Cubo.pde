@@ -130,7 +130,7 @@ class cube {
   /*void translate (float x, float y, float z) {
     
   }*/
-  void rotateX(float angle){
+  void rotateX(float angle, float iniRotX, float iniRotY){
     float[][] Rx = {  {1, 0, 0, 0},
                      {0, cos(angle), sin(angle), 0},
                      {0, -sin(angle), cos(angle), 0},
@@ -138,8 +138,8 @@ class cube {
                      
     for (int i=0;i<8;i++) {
       //vertexes[i] = vertexes[i].get();
-      vertexes[i].x = vertexes[i].x - width/2;
-      vertexes[i].y = vertexes[i].y - height/2;
+      vertexes[i].x = vertexes[i].x - iniRotX;//- width/2;
+      vertexes[i].y = vertexes[i].y - iniRotY;//- height/2;
     }
     float [][] aux = new float[8][4];
     
@@ -160,8 +160,8 @@ class cube {
     
     for (int i=0;i<8;i++) {
       //vertexes[i] = vertexes[i].get();
-      vertexes[i].x = vertexes[i].x + width/2;
-      vertexes[i].y = vertexes[i].y + height/2;
+      vertexes[i].x = vertexes[i].x + iniRotX;//+ width/2;
+      vertexes[i].y = vertexes[i].y + iniRotY;//+ height/2;
     }
                      
     
