@@ -41,7 +41,7 @@ class Cube {
   //vertex [] verteces = new vertex[8];
   PVector [] verteces = new PVector[8];
   PVector [] tverteces = new PVector[8];
-  
+
   PVector centroid;
 
   Cube(PVector v0, PVector v2) {
@@ -64,16 +64,15 @@ class Cube {
     for (i=0;i<8;i++) {
       println(i+" x= "+verteces[i].x+" y= "+verteces[i].y +" z= "+verteces[i].z);
     }
-    
-    float x = 0,y = 0, z = 0;
-    
-    for (i=0;i<8;i++){
+
+    float x = 0, y = 0, z = 0;
+
+    for (i=0;i<8;i++) {
       x = x + verteces[i].x;
       y = y + verteces[i].y;
       z = z + verteces[i].z;
     }
     centroid = new PVector( x/8, y/8, z/8);
-    
   }
 
   void setverteces(PVector [] v) {
@@ -118,13 +117,26 @@ class Cube {
     }
   }
   /*void translate (float x, float y, float z) {
-    
-  }*/
-  void rotateX(float angle, float iniRotX, float iniRotY){
-    float[][] Rx = {  {1, 0, 0, 0},
-                     {0, cos(angle), sin(angle), 0},
-                     {0, -sin(angle), cos(angle), 0},
-                     {0, 0, 0, 1}  };
+   
+   }*/
+  void rotateX(float angle, float iniRotX, float iniRotY) {
+    float[][] Rx = {  
+      {
+        1, 0, 0, 0
+      }
+      , 
+      {
+        0, cos(angle), sin(angle), 0
+      }
+      , 
+      {
+        0, -sin(angle), cos(angle), 0
+      }
+      , 
+      {
+        0, 0, 0, 1
+      }
+    };
     //Traslación
     for (int i=0;i<8;i++) {
       //verteces[i] = verteces[i].get();
@@ -132,33 +144,30 @@ class Cube {
       verteces[i].y = verteces[i].y - iniRotY;//- height/2;
     }
     float [][] aux = new float[8][4];
-    
-    for(int i=0;i<8;i++){
+
+    for (int i=0;i<8;i++) {
       aux[i][0] = verteces[i].x;
       aux[i][1] = verteces[i].y;
       aux[i][2] = verteces[i].z;
       aux[i][3] = 1;
     }
-    
-    aux = multiplyMatrix(aux,Rx,8,4,4);
-    
-    for(int i=0;i<8;i++){
+
+    aux = multiplyMatrix(aux, Rx, 8, 4, 4);
+
+    for (int i=0;i<8;i++) {
       verteces[i].x = aux[i][0];
       verteces[i].y = aux[i][1];
       verteces[i].z = aux[i][2];
     }
-    
+
     for (int i=0;i<8;i++) {
 
       //verteces[i] = verteces[i].get();
       verteces[i].x = verteces[i].x + iniRotX;//+ width/2;
       verteces[i].y = verteces[i].y + iniRotY;//+ height/2;
     }
-                     
-    
   }
 }
-
 
 
 
