@@ -149,6 +149,7 @@ class Cube {
     }
     
     for (int i=0;i<8;i++) {
+
       //verteces[i] = verteces[i].get();
       verteces[i].x = verteces[i].x + iniRotX;//+ width/2;
       verteces[i].y = verteces[i].y + iniRotY;//+ height/2;

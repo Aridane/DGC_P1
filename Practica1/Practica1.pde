@@ -41,6 +41,7 @@ void setup(){
 
 void draw(){
    background(128,128,128);
+
    int i = 0, j;
    for (i=0;i<nButtons;i++){
      
@@ -73,7 +74,7 @@ void draw(){
 }
 
 void mousePressed() {
-  if (mouseButton == LEFT){
+ if (mouseButton == LEFT){
     for (int i=0;i<nButtons;i++){
       //Podemos estar pulsando un boton
       if (mouseX > buttons[i][0] && mouseX < buttons[i][0] + buttonWidth &&
@@ -140,6 +141,7 @@ void mousePressed() {
 }
 
 void mouseReleased() {
+
   for (int i=0;i<nButtons;i++){
     if (!(mouseX > buttons[i][0] && mouseX < buttons[i][0] + buttonWidth &&
         mouseY > buttons[i][1] && mouseY < buttons[i][1] + buttonHeight))
