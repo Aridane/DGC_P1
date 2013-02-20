@@ -179,7 +179,7 @@ void mouseReleased() {
       }
     }
   }  
-  draw();
+  //draw();
 }
 
 void mouseDragged() {
@@ -206,18 +206,18 @@ void mouseDragged() {
           figure = (Figure)figures.get(figures.size()-1);
           figure.rotateX((prevDragY-dragY)*0.02, iniPressedX,iniPressedY); 
         }
-        draw();      
+        //draw();      
         break;
       case 4:
         figure = (Figure)figures.get(figures.size()-1);
         figure.translate(-prevDragX+dragX, -prevDragY+dragY, 0);
-        draw(); 
+        //draw(); 
         break;
       case 5:
         if (cube != null) cube.rotateX((prevDragY-dragY)*0.02, iniPressedX, iniPressedY);  
         figure = (Figure)figures.get(figures.size()-1);
         figure.rotateY((prevDragX-dragX)*0.02, iniPressedX,iniPressedY);
-        draw();         
+        //draw();         
         break;
       }
     }

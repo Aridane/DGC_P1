@@ -195,10 +195,7 @@ class Figure {
         0, 0, 0, 1
       }
     };
-    println("================================================");
-                for (int j=0;j<nVerteces;j++) {
-          println(" i = " + j + " --- " + verteces[j][0] + " " + verteces[j][1] + " " + verteces[j][2] + " " + verteces[j][3]);
-        }
+
     for (int k=0;k<nVerteces;k++) {
       verteces[k][0] = verteces[k][0] - iniRotX;
       verteces[k][1] = verteces[k][1] - iniRotY;
@@ -206,9 +203,6 @@ class Figure {
       verteces[k][3] = verteces[k][3];
       
     }
-                for (int j=0;j<nVerteces;j++) {
-          println(" i = " + j + " --- " + verteces[j][0] + " " + verteces[j][1] + " " + verteces[j][2] + " " + verteces[j][3]);
-        }
     tMatrix = multiplyMatrix(Rx,tMatrix, 4, 4, 4);
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
 
@@ -218,10 +212,6 @@ class Figure {
       tVerteces[k][0] = tVerteces[k][0] + iniRotX;
       tVerteces[k][1] = tVerteces[k][1] + iniRotY;
     }
-                for (int j=0;j<nVerteces;j++) {
-          println(" i = " + j + " --- " + verteces[j][0] + " " + verteces[j][1] + " " + verteces[j][2] + " " + verteces[j][3]);
-        }
-            println("================================================");
   }
 
   void rotateY(float angle, float iniRotX, float iniRotY) {
