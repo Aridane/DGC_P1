@@ -1,7 +1,7 @@
 class Figure {
   //vertex [] verteces = new vertex[8];
-  float [][] verteces = new float[100][];
-  float [][] tVerteces = new float[100][];
+  float [][] verteces = new float[10000][];
+  float [][] tVerteces = new float[10000][];
 
   float [][] tMatrix = {
     {
@@ -22,7 +22,7 @@ class Figure {
 
   boolean revolution = false;
 
-  int nSteps = 4;
+  int nSteps = 10;
 
   boolean closed = false;
 
@@ -75,16 +75,16 @@ class Figure {
     float x = 0, y = 0, z = 0;
     if (!revolution) {
       for (int i=0;i<nVerteces;i++) {
-        x = x + verteces[i][0];
-        y = y + verteces[i][1];
-        z = z + verteces[i][2];
+        x = x + tVerteces[i][0];
+        y = y + tVerteces[i][1];
+        z = z + tVerteces[i][2];
       }
     }
     else {
       float angle = 360;
-      x = verteces[0][0];
-      y = verteces[0][1];
-      z = verteces[0][2];
+      x = tVerteces[0][0];
+      y = tVerteces[0][1];
+      z = tVerteces[0][2];
       for (int i=1; i<nSteps;i++) {
         for (int k=0;k<nVerteces;k++) {
           verteces[k][0] = verteces[k][0] - width/2;
@@ -145,8 +145,6 @@ class Figure {
     if (closed && revolution) {
       for (i=0;i<(nVerteces/nSteps);i++) {
         for (int j=0;j<nSteps;j++) {
-          println("UNO " + (int)((j*(nVerteces/nSteps))+i) + " CON " + (int)(((j+1)%nSteps)*(nVerteces/nSteps)+i));
-          
           myLine(tVerteces[(j*(nVerteces/nSteps))+i], tVerteces[((j+1)%nSteps)*(nVerteces/nSteps)+i],2);  
           if (i < ((nVerteces/nSteps)-1))myLine(tVerteces[i+j*(nVerteces/nSteps)], tVerteces[i+j*(nVerteces/nSteps)+1], 2);
         }
@@ -174,7 +172,7 @@ class Figure {
       }
     };
 
-    tMatrix = multiplyMatrix(tMatrix, T, 4, 4, 4);
+    tMatrix = multiplyMatrix(T,tMatrix, 4, 4, 4);
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
 
   }
@@ -197,8 +195,33 @@ class Figure {
         0, 0, 0, 1
       }
     };
-    tMatrix = multiplyMatrix(Rx, tMatrix, 4, 4, 4);
+    println("================================================");
+                for (int j=0;j<nVerteces;j++) {
+          println(" i = " + j + " --- " + verteces[j][0] + " " + verteces[j][1] + " " + verteces[j][2] + " " + verteces[j][3]);
+        }
+    for (int k=0;k<nVerteces;k++) {
+      verteces[k][0] = verteces[k][0] - iniRotX;
+      verteces[k][1] = verteces[k][1] - iniRotY;
+      verteces[k][2] = verteces[k][2];
+      verteces[k][3] = verteces[k][3];
+      
+    }
+                for (int j=0;j<nVerteces;j++) {
+          println(" i = " + j + " --- " + verteces[j][0] + " " + verteces[j][1] + " " + verteces[j][2] + " " + verteces[j][3]);
+        }
+    tMatrix = multiplyMatrix(Rx,tMatrix, 4, 4, 4);
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
+
+    for (int k=0;k<nVerteces;k++) {
+      verteces[k][0] = verteces[k][0] + iniRotX;
+      verteces[k][1] = verteces[k][1] + iniRotY;
+      tVerteces[k][0] = tVerteces[k][0] + iniRotX;
+      tVerteces[k][1] = tVerteces[k][1] + iniRotY;
+    }
+                for (int j=0;j<nVerteces;j++) {
+          println(" i = " + j + " --- " + verteces[j][0] + " " + verteces[j][1] + " " + verteces[j][2] + " " + verteces[j][3]);
+        }
+            println("================================================");
   }
 
   void rotateY(float angle, float iniRotX, float iniRotY) {
@@ -219,8 +242,21 @@ class Figure {
         0, 0, 0, 1
       }
     };
-    tMatrix = multiplyMatrix(Ry, tMatrix, 4, 4, 4);
+   /* for (int k=0;k<nVerteces;k++) {
+      verteces[k][0] = verteces[k][0] - iniRotX;
+      verteces[k][1] = verteces[k][1] - iniRotY;
+    }*/
+    
+    tMatrix = multiplyMatrix(Ry,tMatrix, 4, 4, 4);
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
+    /*    for (int k=0;k<nVerteces;k++) {
+      verteces[k][0] = verteces[k][0] + iniRotX;
+      verteces[k][1] = verteces[k][1] + iniRotY;
+      tVerteces[k][0] = tVerteces[k][0] + iniRotX;
+      tVerteces[k][1] = tVerteces[k][1] + iniRotY;
+    }*/
+            for (int j=0;j<nVerteces;j++) {
+          println(" i = " + j + " --- " + tVerteces[j][0] + " " + tVerteces[j][1] + " " + tVerteces[j][2] + " " + tVerteces[j][3]);
+        }
   }
 }
-

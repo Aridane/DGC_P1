@@ -5,11 +5,11 @@ ArrayList figures = new ArrayList();
 
 float k = 400;
 
-int nButtons = 4;
+int nButtons = 5;
 float [][] buttons = new float[nButtons][2];
 boolean [] buttonsPressed = new boolean[nButtons];
 String [] buttonsText = {
-  "Cubo", "Fig", "RotX", "Rev"
+  "Cubo", "Fig", "RotX", "Rev", "Tr", "RotY"
 };
 float buttonWidth = 60;
 float buttonHeight = 20;
@@ -80,21 +80,16 @@ void mousePressed() {
         mouseY > buttons[i][1] && mouseY < buttons[i][1] + buttonHeight)
       { 
         buttonsPressed[i] = buttonsPressed[i] ^ true;
-        iniPressedX = mouseX;
-        iniPressedY = mouseY;
         if (buttonsPressed[i]) fill(160, 160, 160);
         else fill(90, 90, 90);
         rect(buttons[i][0], buttons[i][1], buttonWidth, buttonHeight);
         fill(0);
-        println("Button " + i + " pressed");
         return;
       }
     }
     for (int i=0;i<nButtons;i++) {
       //Estar haciendo click IZQUIERDO con el boton activado
       if (buttonsPressed[i]) {
-        iniPressedX = mouseX;
-        iniPressedY = mouseY;
         switch(i) {
           //Boton de crear Cubo
         case 0:
@@ -126,9 +121,24 @@ void mousePressed() {
           prevDragY = mouseY;
 
           break;
+          //Trasladar
+        case 4:
+          prevDragX = mouseX;
+          prevDragY = mouseY;
+
+          break;
+          //Rotar en Y
+        case 5:
+          prevDragX = mouseX;
+          prevDragY = mouseY;
+          break; 
+         
         }
       }
     }
+    iniPressedX = mouseX;
+    iniPressedY = mouseY;
+    println("DESPLAZAMIENTOS X e Y"+iniPressedX + " " + iniPressedY);
   }
   else if (mouseButton == RIGHT) {
     //En caso de click derecho con el boton de figura, procedemos a "cerrar"
@@ -178,6 +188,7 @@ void mouseDragged() {
   for (int i=0;i<nButtons;i++) {
     //Estar haciendo click con el boton activado
     if (buttonsPressed[i]) {
+      Figure figure;
       switch(i) {
         //Boton de crear Cubo
       case 0:
@@ -187,16 +198,25 @@ void mouseDragged() {
         break;
         //Boton de crear Figura
       case 1:
-
         break;
         //Boton de rotar en X
       case 2:
-        if (cube != null) cube.rotateX((prevDragY-dragY)*0.02, iniPressedX, iniPressedY);
-        Figure figure = (Figure)figures.get(figures.size()-1);
-        //println("X = " + (int)(prevDragX-dragX) + " Y = " + (int)(prevDragY-dragY));
+        if (cube != null) cube.rotateX((prevDragY-dragY)*0.02, iniPressedX, iniPressedY);  
+        if (figures.size()>0){
+          figure = (Figure)figures.get(figures.size()-1);
+          figure.rotateX((prevDragY-dragY)*0.02, iniPressedX,iniPressedY); 
+        }
+        draw();      
+        break;
+      case 4:
+        figure = (Figure)figures.get(figures.size()-1);
         figure.translate(-prevDragX+dragX, -prevDragY+dragY, 0);
-        //figure.rotateX((prevDragY-dragY)*0.02, iniPressedX,iniPressedY);
-        //figure.translate(iniPressedX,iniPressedY,0);
+        draw(); 
+        break;
+      case 5:
+        if (cube != null) cube.rotateX((prevDragY-dragY)*0.02, iniPressedX, iniPressedY);  
+        figure = (Figure)figures.get(figures.size()-1);
+        figure.rotateY((prevDragX-dragX)*0.02, iniPressedX,iniPressedY);
         draw();         
         break;
       }
@@ -204,6 +224,5 @@ void mouseDragged() {
   }
   prevDragX = mouseX;
   prevDragY = mouseY;  
-  draw();
-}
 
+}
