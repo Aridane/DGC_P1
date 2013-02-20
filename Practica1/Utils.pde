@@ -32,6 +32,6 @@ void myLine(float [] v0, float [] v1, int n) {
 
     line(aux0X, aux0Y, aux1X, aux1Y);
   }
-  if (n == 3) line(v0[0], v0[1], v0[2], v1[0], v1[1], v1[2]);
+  //if (n == 3) line(v0[0], v0[1], v0[2], v1[0], v1[1], v1[2]);
 }
 

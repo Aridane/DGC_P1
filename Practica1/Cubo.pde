@@ -82,7 +82,8 @@ class Cube {
     }
   }
 
-  void draw(float k) {
+  void draw(float k0) {
+    float k = k0;
     int i = 0;
     for (i=0;i<8;i++) {
       tverteces[i] = verteces[i].get();
@@ -152,7 +153,7 @@ class Cube {
       aux[i][3] = 1;
     }
 
-    aux = multiplyMatrix(aux, Rx, 8, 4, 4);
+    //aux = multiplyMatrix(aux, Rx, 8, 4, 4);
 
     for (int i=0;i<8;i++) {
       verteces[i].x = aux[i][0];

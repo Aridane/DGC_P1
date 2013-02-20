@@ -177,7 +177,8 @@ class Figure {
 
   }
 
-  void rotateX(float angle, float iniRotX, float iniRotY) {
+  void rotateX(float angle0, float iniRotX, float iniRotY) {
+    float angle = angle0;
     float[][] Rx = {  
       {
         1, 0, 0, 0
@@ -195,26 +196,37 @@ class Figure {
         0, 0, 0, 1
       }
     };
-
-    for (int k=0;k<nVerteces;k++) {
-      verteces[k][0] = verteces[k][0] - iniRotX;
-      verteces[k][1] = verteces[k][1] - iniRotY;
-      verteces[k][2] = verteces[k][2];
-      verteces[k][3] = verteces[k][3];
-      
-    }
-    tMatrix = multiplyMatrix(Rx,tMatrix, 4, 4, 4);
+    float [][] T = {
+      {
+        1, 0, 0, 0
+      }
+      , 
+      {
+        0, 1, 0, 0
+      }
+      , 
+      {
+        0, 0, 1, 0
+      }
+      , 
+      {
+        -iniRotX, -iniRotY, 0, 1
+      }
+    };
+    float [][] aux = multiplyMatrix(T, Rx, 4, 4, 4);
+    T[3][0] = +iniRotX;
+    T[3][1] = +iniRotY;
+    aux = multiplyMatrix(aux, T, 4, 4, 4);
+    tMatrix = multiplyMatrix(tMatrix,aux, 4, 4, 4);
+    
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
 
-    for (int k=0;k<nVerteces;k++) {
-      verteces[k][0] = verteces[k][0] + iniRotX;
-      verteces[k][1] = verteces[k][1] + iniRotY;
-      tVerteces[k][0] = tVerteces[k][0] + iniRotX;
-      tVerteces[k][1] = tVerteces[k][1] + iniRotY;
-    }
+    
+
   }
 
-  void rotateY(float angle, float iniRotX, float iniRotY) {
+  void rotateY(float angle0, float iniRotX, float iniRotY) {
+        float angle = angle0;
     float[][] Ry = {  
       {
         cos(angle), 0, -sin(angle), 0
