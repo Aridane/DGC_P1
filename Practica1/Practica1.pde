@@ -1,9 +1,12 @@
 float iniX, iniY, dragX, dragY;
 Cube cube;
+
+int selectedFigure = -1;
+
 ArrayList cubes = new ArrayList();
 ArrayList figures = new ArrayList();
 
-float k = 400;
+float k = 800;
 
 int nButtons = 6;
 float [][] buttons = new float[nButtons][2];
@@ -87,6 +90,20 @@ void mousePressed() {
         return;
       }
     }
+    PVector actualPos = new PVector(mouseX, mouseY, 0);
+    Figure figure;
+    float min = 999999;
+    selectedFigure = -1;
+    for (int i=0;i<figures.size();i++) {
+      figure = (Figure)figures.get(i);
+      if (figure.closed()){
+        float dist = actualPos.dist(figure.getCentroid());
+        if (dist < min) {
+          min = dist;
+          selectedFigure = i;
+        }
+      }
+    }
     for (int i=0;i<nButtons;i++) {
       //Estar haciendo click IZQUIERDO con el boton activado
       if (buttonsPressed[i]) {
@@ -98,12 +115,12 @@ void mousePressed() {
           //Boton de crear Figura
         case 1:
           if (figures.size() == 0) {
-            Figure figure = new Figure(buttonsPressed[3]);
+            figure = new Figure(buttonsPressed[3]);
             figure.addVertex(mouseX, mouseY, 0);
             figures.add(figure);
           }
           else {
-            Figure figure = (Figure)figures.get(figures.size()-1);
+            figure = (Figure)figures.get(figures.size()-1);
             if (figure.closed()) {
               Figure newFigure = new Figure(buttonsPressed[3]);
               newFigure.addVertex(mouseX, mouseY, 0);
@@ -131,8 +148,7 @@ void mousePressed() {
         case 5:
           prevDragX = mouseX;
           prevDragY = mouseY;
-          break; 
-         
+          break;
         }
       }
     }
@@ -196,19 +212,23 @@ void mouseDragged() {
         //Boton de rotar en X
       if (buttonsPressed[2]){
         if (cube != null) cube.rotateX((prevDragY-dragY)*0.02, iniPressedX, iniPressedY);  
-        if (figures.size()>0){
-          figure = (Figure)figures.get(figures.size()-1);
+        if (selectedFigure != -1){
+          figure = (Figure)figures.get(selectedFigure);
           figure.rotateX((prevDragY-dragY)*0.02, iniPressedX,iniPressedY); 
         }      
       }
       if (buttonsPressed[4]){
-        figure = (Figure)figures.get(figures.size()-1);
-        figure.translate(-prevDragX+dragX, -prevDragY+dragY, 0);
+        if (selectedFigure != -1){
+          figure = (Figure)figures.get(selectedFigure);
+          figure.translate(-prevDragX+dragX, -prevDragY+dragY, 0);
+        }
       }
       if (buttonsPressed[5]){
         if (cube != null) cube.rotateX((prevDragY-dragY)*0.02, iniPressedX, iniPressedY); 
-        figure = (Figure)figures.get(figures.size()-1);
-        figure.rotateY((prevDragX-dragX)*0.02, iniPressedX,iniPressedY); 
+        if (selectedFigure != -1){
+          figure = (Figure)figures.get(selectedFigure);
+          figure.rotateX((prevDragY-dragY)*0.02, iniPressedX,iniPressedY); 
+        }   
       }
   prevDragX = mouseX;
   prevDragY = mouseY;  

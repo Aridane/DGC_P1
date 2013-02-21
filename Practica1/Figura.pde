@@ -131,6 +131,20 @@ class Figure {
       }
     centroid = new PVector(x/nVerteces, y/nVerteces, z/nVerteces);
   }
+  
+  PVector getCentroid() {
+    return centroid;
+  }
+  
+  void updateCentroid() {
+    float x = 0, y = 0, z = 0;
+    for (int j=0;j<nVerteces;j++) {
+      x = x + tVerteces[j][0];
+      y = y + tVerteces[j][1];
+      z = z + tVerteces[j][2];
+    }
+    centroid = new PVector(x/nVerteces, y/nVerteces, z/nVerteces);
+  }
 
   //TODO Crear funcion miLinea, la cual aparte de dibujar la línea aplica la perspectiva.
   void draw(float k) {
@@ -174,6 +188,7 @@ class Figure {
 
     tMatrix = multiplyMatrix(T,tMatrix, 4, 4, 4);
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
+    updateCentroid();
 
   }
 
@@ -221,7 +236,7 @@ class Figure {
     
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
 
-    
+    updateCentroid();
 
   }
 
@@ -244,21 +259,32 @@ class Figure {
         0, 0, 0, 1
       }
     };
-   /* for (int k=0;k<nVerteces;k++) {
-      verteces[k][0] = verteces[k][0] - iniRotX;
-      verteces[k][1] = verteces[k][1] - iniRotY;
-    }*/
-    
-    tMatrix = multiplyMatrix(Ry,tMatrix, 4, 4, 4);
+       float [][] T = {
+      {
+        1, 0, 0, 0
+      }
+      , 
+      {
+        0, 1, 0, 0
+      }
+      , 
+      {
+        0, 0, 1, 0
+      }
+      , 
+      {
+        -iniRotX, -iniRotY, 0, 1
+      }
+    };
+    float [][] aux = multiplyMatrix(T, Ry, 4, 4, 4);
+    T[3][0] = +iniRotX;
+    T[3][1] = +iniRotY;
+    aux = multiplyMatrix(aux, T, 4, 4, 4);
+
+
+    tMatrix = multiplyMatrix(tMatrix, aux, 4, 4, 4);
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
-    /*    for (int k=0;k<nVerteces;k++) {
-      verteces[k][0] = verteces[k][0] + iniRotX;
-      verteces[k][1] = verteces[k][1] + iniRotY;
-      tVerteces[k][0] = tVerteces[k][0] + iniRotX;
-      tVerteces[k][1] = tVerteces[k][1] + iniRotY;
-    }*/
-            for (int j=0;j<nVerteces;j++) {
-          println(" i = " + j + " --- " + tVerteces[j][0] + " " + tVerteces[j][1] + " " + tVerteces[j][2] + " " + tVerteces[j][3]);
-        }
+    updateCentroid();
+    
   }
 }
