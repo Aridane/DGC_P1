@@ -8,13 +8,13 @@ ArrayList figures = new ArrayList();
 
 float k = 800;
 
-int nButtons = 6;
+int nButtons = 7;
 float [][] buttons = new float[nButtons][2];
 boolean [] buttonsPressed = new boolean[nButtons];
 String [] buttonsText = {
-  "Cubo", "Fig", "RotX", "Rev", "Tr", "RotY"
+  "Cubo", "Fig", "RotX", "Rev", "Tr", "RotY", "Triangles"
 };
-float buttonWidth = 60;
+float buttonWidth = 90;
 float buttonHeight = 20;
 
 

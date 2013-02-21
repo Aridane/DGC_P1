@@ -3,6 +3,8 @@ class Figure {
   float [][] verteces = new float[10000][];
   float [][] tVerteces = new float[10000][];
 
+  int [][] triangles;
+
   float [][] tMatrix = {
     {
       1, 0, 0, 0
@@ -22,7 +24,7 @@ class Figure {
 
   boolean revolution = false;
 
-  int nSteps = 10;
+  int nSteps = 4;
 
   boolean closed = false;
 
@@ -124,11 +126,28 @@ class Figure {
         tVerteces[i][3] = verteces[i][3];
       }
     }
-    for(int i=0;i<4;i++)
+    for(int i=0;i<4;i++) {
       for (int j=0;j<4;j++){
         if (i == j) tMatrix[i][j] = 1;
         else tMatrix[i][j] = 0;
       }
+    }
+    triangles = new int[nSteps*2*((nVerteces/nSteps)-1)][3];
+    int triangleIndex = 0;
+    for (int j = 0;j<nSteps;j++){
+      for (int k=0;j<((nVerteces/nSteps)-2);j++){
+        triangles[triangleIndex][0] = k;
+        triangles[triangleIndex][1] = (k + (nVerteces/nSteps)-1)% nVerteces;
+        triangles[triangleIndex][2] = triangles[triangleIndex][1] + 1;
+        
+        triangleIndex = triangleIndex + 1;
+        
+        triangles[triangleIndex][0] = k;
+        triangles[triangleIndex][1] = ((k + (nVerteces/nSteps)-1)% nVerteces) + 1;
+        triangles[triangleIndex][2] = k+1;          
+        
+      }
+    }
     centroid = new PVector(x/nVerteces, y/nVerteces, z/nVerteces);
   }
   
@@ -241,7 +260,7 @@ class Figure {
   }
 
   void rotateY(float angle0, float iniRotX, float iniRotY) {
-        float angle = angle0;
+    float angle = angle0;
     float[][] Ry = {  
       {
         cos(angle), 0, -sin(angle), 0
