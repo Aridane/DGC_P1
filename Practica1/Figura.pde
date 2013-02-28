@@ -4,6 +4,13 @@ class Figure {
   float [][] tVerteces = new float[10000][];
 
   int [][] triangles;
+  
+  float [][] triangleCentroids;
+  float [][] tTriangleCentroids;
+  
+  
+  float [][] normals;
+  float [][] tNormals;
 
   float [][] tMatrix = {
     {
@@ -21,6 +28,8 @@ class Figure {
   };
 
   PVector centroid;
+  
+  int nTriangles = 0;
 
   boolean revolution = false;
 
@@ -81,6 +90,7 @@ class Figure {
         y = y + tVerteces[i][1];
         z = z + tVerteces[i][2];
       }
+      nSteps = 0;
     }
     else {
       float angle = 360;
@@ -132,23 +142,163 @@ class Figure {
         else tMatrix[i][j] = 0;
       }
     }
-    triangles = new int[nSteps*2*((nVerteces/nSteps)-1)][3];
+    centroid = new PVector(x/nVerteces, y/nVerteces, z/nVerteces);
+    
+    if (!revolution) return;
+    
+    nTriangles = nSteps*2*((nVerteces/nSteps)-1);
+    triangles = new int[nTriangles][3];
+    triangleCentroids = new float[nTriangles][4];
+    normals = new float[nTriangles][4];
+    
+    tTriangleCentroids = new float[nTriangles][4];
+    tNormals = new float[nTriangles][4];
+    
     int triangleIndex = 0;
+    int aux = 0;
+    float tX = 0, tY = 0, tZ = 0;
     for (int j = 0;j<nSteps;j++){
-      for (int k=0;j<((nVerteces/nSteps)-2);j++){
-        triangles[triangleIndex][0] = k;
-        triangles[triangleIndex][1] = (k + (nVerteces/nSteps)-1)% nVerteces;
+      for (int k=0;k<((nVerteces/nSteps)-1);k++){
+        
+        aux = k + j*(nVerteces/nSteps);
+        
+        //Cálculo de Vertices
+        triangles[triangleIndex][0] = aux;
+        triangles[triangleIndex][1] = (aux + (nVerteces/nSteps))% nVerteces;
         triangles[triangleIndex][2] = triangles[triangleIndex][1] + 1;
         
+        //Cálculo del centroide
+        tX = tX + verteces[aux][0];
+        tX = tX + verteces[triangles[triangleIndex][1]][0];
+        tX = tX + verteces[triangles[triangleIndex][2]][0];
+        tX = tX/3.;
+        
+        tY = tY + verteces[aux][1];
+        tY = tY + verteces[triangles[triangleIndex][1]][1];
+        tY = tY + verteces[triangles[triangleIndex][2]][1];
+        tY = tY/3.;
+        
+        tZ = tZ + verteces[aux][2];
+        tZ = tZ + verteces[triangles[triangleIndex][1]][2];
+        tZ = tZ + verteces[triangles[triangleIndex][2]][2];        
+        tZ = tZ/3.;
+        
+        triangleCentroids[triangleIndex][0] = tX;
+        triangleCentroids[triangleIndex][1] = tY;
+        triangleCentroids[triangleIndex][2] = tZ;
+        triangleCentroids[triangleIndex][3] = 1;
+        
+        tTriangleCentroids[triangleIndex][0] = tX;
+        tTriangleCentroids[triangleIndex][1] = tY;
+        tTriangleCentroids[triangleIndex][2] = tZ;
+        tTriangleCentroids[triangleIndex][3] = 1;
+        
+        
+        println("CENTROIDE " + tX + " " + tY + " " + tZ);
+        
+        tX = 0;
+        tY = 0;
+        tZ = 0;
+        
+        //Cálculo de la normal
+        float [] v43 = new float[3];
+        float [] v40 = new float[3];
+        v43[0] = verteces[triangles[triangleIndex][1]][0] - verteces[triangles[triangleIndex][2]][0];
+        v43[1] = verteces[triangles[triangleIndex][1]][1] - verteces[triangles[triangleIndex][2]][1];
+        v43[2] = verteces[triangles[triangleIndex][1]][2] - verteces[triangles[triangleIndex][2]][2];
+        
+        
+        v40[0] = verteces[triangles[triangleIndex][0]][0] - verteces[triangles[triangleIndex][2]][0];
+        v40[1] = verteces[triangles[triangleIndex][0]][1] - verteces[triangles[triangleIndex][2]][1];
+        v40[1] = verteces[triangles[triangleIndex][0]][2] - verteces[triangles[triangleIndex][2]][2];
+        println("NORMAL v40 " + v40[0] + " " + v40[1]);
+        println("NORMAL v43 " + v43[0] + " " + v43[1]);
+        
+        normals[triangleIndex][0] = v43[1] * v40[2] - (v40[1] * v43[2]);
+        normals[triangleIndex][1] = v43[0] * v40[2] - (v40[0] * v43[2]);
+        normals[triangleIndex][2] = v43[0] * v40[1] - (v40[0] * v43[1]);
+        println("NORMAL ORIGINAL 0 -> " + normals[triangleIndex][0] + " " + normals[triangleIndex][1] + " " + normals[triangleIndex][2]);
+        float module = sqrt( normals[triangleIndex][0]* normals[triangleIndex][0] +  
+                             normals[triangleIndex][1]* normals[triangleIndex][1] + 
+                             normals[triangleIndex][2]* normals[triangleIndex][2]);
+                             
+        normals[triangleIndex][0] = normals[triangleIndex][0]/module;
+        normals[triangleIndex][1] = normals[triangleIndex][1]/module;
+        normals[triangleIndex][2] = normals[triangleIndex][2]/module;
+        normals[triangleIndex][3] = 1;
+        
+        tNormals[triangleIndex][0] = normals[triangleIndex][0]/module;
+        tNormals[triangleIndex][1] = normals[triangleIndex][1]/module;
+        tNormals[triangleIndex][2] = normals[triangleIndex][2]/module;
+        tNormals[triangleIndex][3] = 1;
+        
+         
         triangleIndex = triangleIndex + 1;
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
+        triangles[triangleIndex][0] = aux;
+        triangles[triangleIndex][1] = ((aux + (nVerteces/nSteps))% nVerteces) + 1;
+        triangles[triangleIndex][2] = aux+1;       
+     
+     //Cálculo del centroide
+        tX = tX + verteces[triangles[triangleIndex][0]][0];
+        tX = tX + verteces[triangles[triangleIndex][1]][0];
+        tX = tX + verteces[triangles[triangleIndex][2]][0];
+        tX = tX/3.;
         
-        triangles[triangleIndex][0] = k;
-        triangles[triangleIndex][1] = ((k + (nVerteces/nSteps)-1)% nVerteces) + 1;
-        triangles[triangleIndex][2] = k+1;          
+        tY = tY + verteces[triangles[triangleIndex][0]][1];
+        tY = tY + verteces[triangles[triangleIndex][1]][1];
+        tY = tY + verteces[triangles[triangleIndex][2]][1];
+        tY = tY/3.;
         
+        tZ = tZ + verteces[triangles[triangleIndex][0]][2];
+        tZ = tZ + verteces[triangles[triangleIndex][1]][2];
+        tZ = tZ + verteces[triangles[triangleIndex][2]][2];        
+        tZ = tZ/3.;
+        
+        triangleCentroids[triangleIndex][0] = tX;
+        triangleCentroids[triangleIndex][1] = tY;
+        triangleCentroids[triangleIndex][2] = tZ;
+        triangleCentroids[triangleIndex][3] = 1;
+        
+        tTriangleCentroids[triangleIndex][0] = tX;
+        tTriangleCentroids[triangleIndex][1] = tY;
+        tTriangleCentroids[triangleIndex][2] = tZ;
+        tTriangleCentroids[triangleIndex][3] = 1;
+        println("CENTROIDE " + tX + " " + tY + " " + tZ);
+        
+        tX = 0;
+        tY = 0;
+        tZ = 0;   
+      
+      //Cálculo de la normal
+        float [] v41 = new float[3];
+        v41[0] = verteces[triangles[triangleIndex][2]][0] - verteces[triangles[triangleIndex][1]][0];
+        v41[1] = verteces[triangles[triangleIndex][2]][1] - verteces[triangles[triangleIndex][1]][1];
+        v41[2] = verteces[triangles[triangleIndex][2]][2] - verteces[triangles[triangleIndex][1]][2];
+        
+        
+        normals[triangleIndex][0] = v40[1] * v41[2] - (v41[1] * v40[2]);
+        normals[triangleIndex][1] = v40[0] * v41[2] - (v41[0] * v40[2]);
+        normals[triangleIndex][2] = v40[0] * v41[1] - (v41[0] * v40[1]);
+        
+        module = sqrt( normals[triangleIndex][0]* normals[triangleIndex][0] +  
+                             normals[triangleIndex][1]* normals[triangleIndex][1] + 
+                             normals[triangleIndex][2]* normals[triangleIndex][2]);
+                             
+        normals[triangleIndex][0] = normals[triangleIndex][0]/module;
+        normals[triangleIndex][1] = normals[triangleIndex][1]/module;
+        normals[triangleIndex][2] = normals[triangleIndex][2]/module;
+        normals[triangleIndex][3] = 1;
+        
+        tNormals[triangleIndex][0] = normals[triangleIndex][0]/module;
+        tNormals[triangleIndex][1] = normals[triangleIndex][1]/module;
+        tNormals[triangleIndex][2] = normals[triangleIndex][2]/module;
+        tNormals[triangleIndex][3] = 1;
+        println("NORMAL ORIGINAL " + normals[triangleIndex][0] + " " + normals[triangleIndex][1] + " " + normals[triangleIndex][2]);
+      
+        triangleIndex = triangleIndex + 1;
       }
     }
-    centroid = new PVector(x/nVerteces, y/nVerteces, z/nVerteces);
   }
   
   PVector getCentroid() {
@@ -164,9 +314,21 @@ class Figure {
     }
     centroid = new PVector(x/nVerteces, y/nVerteces, z/nVerteces);
   }
+  
+  void normalizeNormals(){
+    for (int i=0;i<nTriangles;i++){
+      float module = sqrt( tNormals[i][0]* tNormals[i][0] +  
+                           tNormals[i][1]* tNormals[i][1] + 
+                           tNormals[i][2]* tNormals[i][2]);
+      tNormals[i][0] = tNormals[i][0]/module;
+      tNormals[i][1] = tNormals[i][1]/module;
+      tNormals[i][2] = tNormals[i][2]/module;
+          
+    }
+  }
 
   //TODO Crear funcion miLinea, la cual aparte de dibujar la línea aplica la perspectiva.
-  void draw(float k) {
+  void draw(float k, boolean triang, boolean norm) {
     int i = 0;
     float z = 0, a = 0;
     if (!closed)for (i=0;i<nVerteces-1;i++) myLine(tVerteces[i], tVerteces[(i+1)], 2);
@@ -179,8 +341,32 @@ class Figure {
       for (i=0;i<(nVerteces/nSteps);i++) {
         for (int j=0;j<nSteps;j++) {
           myLine(tVerteces[(j*(nVerteces/nSteps))+i], tVerteces[((j+1)%nSteps)*(nVerteces/nSteps)+i],2);  
-          if (i < ((nVerteces/nSteps)-1))myLine(tVerteces[i+j*(nVerteces/nSteps)], tVerteces[i+j*(nVerteces/nSteps)+1], 2);
+          if (i < ((nVerteces/nSteps)-1)){
+            myLine(tVerteces[i+j*(nVerteces/nSteps)], tVerteces[i+j*(nVerteces/nSteps)+1], 2);
+          }
         }
+      }
+      if(triang){
+        for(int l=0;l<nTriangles;l=l+2){
+          //myLine(tVerteces[triangles[l][0]],tVerteces[triangles[l][1]],2);
+          //myLine(tVerteces[triangles[l][1]],tVerteces[triangles[l][2]],2);
+          myLine(tVerteces[triangles[l][2]],tVerteces[triangles[l][0]],2);
+          //println("--------------"+l+"-----------------");
+          //println("PINTO -> " + triangles[l][2] + " " + triangles[l][0]); 
+        }
+      }
+      if(norm){
+        for(int l=0;l<nTriangles;l++){
+          float [] aux = new float[3];
+          aux[0] = tTriangleCentroids[l][0] + tNormals[l][0]*20.;
+          aux[1] = tTriangleCentroids[l][1] + tNormals[l][1]*20.;
+          aux[2] = tTriangleCentroids[l][2] + tNormals[l][2]*20.;
+          println("CENTROIDE " + tTriangleCentroids[l][0] +" "+ tTriangleCentroids[l][1] +" "+ tTriangleCentroids[l][2] );
+          println("NORMAL ORIGINAL " + tNormals[l][0] + " " + tNormals[l][1] + " " + tNormals[l][2]);
+          println("NORMAL NUEVA " + aux[0] + " " + aux[1] + " " + aux[2]);
+          //Línea desde el centroide al centroide + vector
+          myLine(tTriangleCentroids[l],aux,1);
+        }        
       }
     }
   }
@@ -207,7 +393,9 @@ class Figure {
 
     tMatrix = multiplyMatrix(T,tMatrix, 4, 4, 4);
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
+    tTriangleCentroids = multiplyMatrix(triangleCentroids, tMatrix, nTriangles, 4, 4);
     updateCentroid();
+    normalizeNormals();
 
   }
 
@@ -254,7 +442,11 @@ class Figure {
     tMatrix = multiplyMatrix(tMatrix,aux, 4, 4, 4);
     
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
+    tTriangleCentroids = multiplyMatrix(triangleCentroids, tMatrix, nTriangles, 4, 4);
+    tNormals = multiplyMatrix(normals, tMatrix, nTriangles, 4, 4);
 
+
+    normalizeNormals();
     updateCentroid();
 
   }

@@ -8,11 +8,11 @@ ArrayList figures = new ArrayList();
 
 float k = 800;
 
-int nButtons = 7;
+int nButtons = 8;
 float [][] buttons = new float[nButtons][2];
 boolean [] buttonsPressed = new boolean[nButtons];
 String [] buttonsText = {
-  "Cubo", "Fig", "RotX", "Rev", "Tr", "RotY", "Triangles"
+  "Cubo", "Fig", "RotX", "Rev", "Tr", "RotY", "Triangles", "Normals"
 };
 float buttonWidth = 90;
 float buttonHeight = 20;
@@ -70,7 +70,7 @@ void draw() {
   }
   for (i = figures.size()-1;i>=0;i--) {
     Figure figure = (Figure)figures.get(i);
-    figure.draw(k);
+    figure.draw(k,buttonsPressed[6],buttonsPressed[7]);
   }
   //println("x = " + mouseX + " y = " + mouseY);
 }
@@ -227,7 +227,7 @@ void mouseDragged() {
         if (cube != null) cube.rotateX((prevDragY-dragY)*0.02, iniPressedX, iniPressedY); 
         if (selectedFigure != -1){
           figure = (Figure)figures.get(selectedFigure);
-          figure.rotateX((prevDragY-dragY)*0.02, iniPressedX,iniPressedY); 
+          figure.rotateY((prevDragY-dragY)*0.02, iniPressedX,iniPressedY); 
         }   
       }
   prevDragX = mouseX;
