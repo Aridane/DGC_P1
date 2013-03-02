@@ -8,11 +8,11 @@ ArrayList figures = new ArrayList();
 
 float k = 800;
 
-int nButtons = 8;
+int nButtons = 9;
 float [][] buttons = new float[nButtons][2];
 boolean [] buttonsPressed = new boolean[nButtons];
 String [] buttonsText = {
-  "Cubo", "Fig", "RotX", "Rev", "Tr", "RotY", "Triangles", "Normals"
+  "Cubo", "Fig", "RotX", "Rev", "Tr", "RotY", "Triangles", "Normals", "Persp"
 };
 float buttonWidth = 90;
 float buttonHeight = 20;
@@ -70,7 +70,7 @@ void draw() {
   }
   for (i = figures.size()-1;i>=0;i--) {
     Figure figure = (Figure)figures.get(i);
-    figure.draw(k,buttonsPressed[6],buttonsPressed[7]);
+    figure.draw(k,buttonsPressed[6],buttonsPressed[7],buttonsPressed[8]);
   }
   //println("x = " + mouseX + " y = " + mouseY);
 }
