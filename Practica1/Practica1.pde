@@ -227,7 +227,7 @@ void mouseDragged() {
         if (cube != null) cube.rotateX((prevDragY-dragY)*0.02, iniPressedX, iniPressedY); 
         if (selectedFigure != -1){
           figure = (Figure)figures.get(selectedFigure);
-          figure.rotateY((prevDragY-dragY)*0.02, iniPressedX,iniPressedY); 
+          figure.rotateY((prevDragX-dragX)*0.02, iniPressedX,iniPressedY); 
         }   
       }
   prevDragX = mouseX;

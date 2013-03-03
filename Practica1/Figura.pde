@@ -230,7 +230,7 @@ class Figure {
         println("NORMAL v43 " + v43[0] + " " + v43[1] + " " + v43[2]);
         
         normals[triangleIndex][0] = (v40[1] * v43[2]) - (v43[1] * v40[2]);
-        normals[triangleIndex][1] = (v40[0] * v43[2]) - (v43[0] * v40[2]);
+        normals[triangleIndex][1] = -((v40[0] * v43[2]) - (v43[0] * v40[2]));
         normals[triangleIndex][2] = (v40[0] * v43[1]) - (v43[0] * v40[1]);
         println("NORMAL ORIGINAL 0 -> " + normals[triangleIndex][0] + " " + normals[triangleIndex][1] + " " + normals[triangleIndex][2]);
         
@@ -300,7 +300,7 @@ class Figure {
         
         println("VECTOR 41 -> " + triangles[triangleIndex][2] + " -  " + triangles[triangleIndex][1]);
         normals[triangleIndex][0] = (v41[1] * v40[2]) - (v40[1] * v41[2]);
-        normals[triangleIndex][1] = (v41[0] * v40[2]) - (v40[0] * v41[2]);
+        normals[triangleIndex][1] = -((v41[0] * v40[2]) - (v40[0] * v41[2]));
         normals[triangleIndex][2] = (v41[0] * v40[1]) - (v40[0] * v41[1]);
         
         //normals[triangleIndex][0] = normals[triangleIndex][0] + triangleCentroids[triangleIndex][0];
@@ -440,10 +440,10 @@ class Figure {
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
     tTriangleCentroids = multiplyMatrix(triangleCentroids, tMatrix, nTriangles, 4, 4);
     
-    tMatrixNormals = multiplyMatrix(tMatrixNormals,T, 4, 4, 4);
+    //tMatrixNormals = multiplyMatrix(tMatrixNormals,T, 4, 4, 4);
 
     updateCentroid();
-    normalizeNormals();
+    //normalizeNormals();
 
   }
 
@@ -498,7 +498,7 @@ class Figure {
     aux = multiplyMatrix(T, Rx, 4, 4, 4);
     T[3][0] = (iniRotX-width/2.);
     T[3][1] = (iniRotY-height/2.);
-    aux = multiplyMatrix(aux, T, 4, 4, 4);
+    aux = multiplyMatrix(T,aux, 4, 4, 4);
     tMatrixNormals = multiplyMatrix(tMatrixNormals,aux, 4, 4, 4);
     tNormals = multiplyMatrix(normals, tMatrixNormals, nTriangles, 4, 4);
 
@@ -553,6 +553,13 @@ class Figure {
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
     tTriangleCentroids = multiplyMatrix(triangleCentroids, tMatrix, nTriangles, 4, 4);
     
+    T[3][0] = -(iniRotX-width/2.);
+    T[3][1] = -(iniRotY-height/2.);
+    aux = multiplyMatrix(T, Ry, 4, 4, 4);
+    T[3][0] = (iniRotX-width/2.);
+    T[3][1] = (iniRotY-height/2.);
+    aux = multiplyMatrix(T,aux, 4, 4, 4);
+    tMatrixNormals = multiplyMatrix(tMatrixNormals,aux, 4, 4, 4);
     tNormals = multiplyMatrix(normals, tMatrixNormals, nTriangles, 4, 4);
     
     updateCentroid();
