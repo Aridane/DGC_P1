@@ -42,6 +42,8 @@ class Cube {
   PVector [] verteces = new PVector[8];
   PVector [] tverteces = new PVector[8];
 
+  int type = 0;
+
   PVector centroid;
 
   Cube(PVector v0, PVector v2) {
@@ -74,7 +76,13 @@ class Cube {
     }
     centroid = new PVector( x/8, y/8, z/8);
   }
-
+  
+  int type(){
+    return type;
+  }
+  boolean closed(){
+    return true;
+  }
   void setverteces(PVector [] v) {
     int i = 0;
     for (i=0;i<8;i++) {
@@ -82,8 +90,7 @@ class Cube {
     }
   }
 
-  void draw(float k0) {
-    float k = k0;
+  void draw(float k, boolean [] options) {
     int i = 0;
     for (i=0;i<8;i++) {
       tverteces[i] = verteces[i].get();

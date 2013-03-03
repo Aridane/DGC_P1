@@ -3,16 +3,16 @@ Cube cube;
 
 int selectedFigure = -1;
 
-ArrayList cubes = new ArrayList();
 ArrayList figures = new ArrayList();
+ArrayList cubes = new ArrayList();
 
 float k = 800;
 
-int nButtons = 9;
+int nButtons = 11;
 float [][] buttons = new float[nButtons][2];
 boolean [] buttonsPressed = new boolean[nButtons];
 String [] buttonsText = {
-  "Cubo", "Fig", "RotX", "Rev", "Tr", "RotY", "Triangles", "Normals", "Persp"
+  "Cubo", "Fig", "RotX", "Rev", "Tr", "RotY", "Triangles", "Normals", "Persp", "Rayos", "Del"
 };
 float buttonWidth = 90;
 float buttonHeight = 20;
@@ -27,7 +27,7 @@ float prevDragY;
 
 void setup() {
   frame.setResizable(true);
-  size(1024, 768);
+  size(800, 640);
   stroke(0);
   background(128, 128, 128);
 
@@ -63,14 +63,25 @@ void draw() {
   line(width/2, height/2, (width/2)+60, height/2);
   line(width/2, height/2, width/2, height/2-60);
   stroke(0);
-  if (cube != null) cube.draw(k);
-  for (i = cubes.size()-1;i>=0;i--) {
-    Cube cube = (Cube)cubes.get(i);
-    cube.draw(k);
+  
+  if (figures.size() == 0) return;
+  
+  if (buttonsPressed[9]) {
+  //A Pintar con trazado de rayos
+    rayTracing(figures);
   }
-  for (i = figures.size()-1;i>=0;i--) {
-    Figure figure = (Figure)figures.get(i);
-    figure.draw(k,buttonsPressed[6],buttonsPressed[7],buttonsPressed[8]);
+  else {
+    if (cube != null) cube.draw(k,buttonsPressed);
+    for (i = cubes.size()-1;i>=0;i--) {
+      Cube cube = (Cube)cubes.get(i);
+      cube.draw(k,buttonsPressed);
+    }
+    for (i = figures.size()-1;i>=0;i--) {
+      Figure figure = (Figure)figures.get(i);
+      if (i == selectedFigure) strokeWeight(2);
+      figure.draw(k,buttonsPressed /*buttonsPressed[6],buttonsPressed[7],buttonsPressed[8]*/);
+      strokeWeight(1);
+    }
   }
   //println("x = " + mouseX + " y = " + mouseY);
 }
@@ -90,7 +101,7 @@ void mousePressed() {
         return;
       }
     }
-    PVector actualPos = new PVector(mouseX, mouseY, 0);
+    PVector actualPos = new PVector(mouseX, mouseY);
     Figure figure;
     float min = 999999;
     selectedFigure = -1;
@@ -149,6 +160,8 @@ void mousePressed() {
           prevDragX = mouseX;
           prevDragY = mouseY;
           break;
+        case 10:
+          figures.remove(selectedFigure);
         }
       }
     }

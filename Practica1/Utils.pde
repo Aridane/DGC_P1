@@ -36,3 +36,16 @@ void myLine(float [] v0, float [] v1, boolean p) {
     //if (n == 3) line(v0[0], v0[1], v0[2], v1[0], v1[1], v1[2]);
 }
 
+void rayTracing(ArrayList figures){
+  for (int i=0;i<width;i++) {
+    for (int j=0;j<height;j++){
+    //Para cada pixel...
+    
+      for (int k = 0;k<figures.size();k++) {
+      //Para cada figura...
+        Figure figure = (Figure)figures.get(k+1);
+
+      }
+    }
+  } 
+}

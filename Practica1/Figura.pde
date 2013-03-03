@@ -1,13 +1,16 @@
-class Figure {
+class Figure implements Drawable{
   //vertex [] verteces = new vertex[8];
   float [][] verteces = new float[10000][];
   float [][] tVerteces = new float[10000][];
+
+  int type = 1;
 
   int [][] triangles;
   
   float [][] triangleCentroids;
   float [][] tTriangleCentroids;
   
+  int [] colour = new int[3];
   
   float [][] normals;
   float [][] tNormals;
@@ -55,11 +58,17 @@ class Figure {
 
   Figure(boolean revolutionFlag) {
     revolution = revolutionFlag;
-    
+    colour[0] = (int)random(255);
+    colour[1] = (int)random(255);
+    colour[2] = (int)random(255);
   }
 
   boolean closed() {
     return closed;
+  }
+
+  int type(){
+    return type;
   }
 
   void setVertex(int n, float x, float y, float z) {
@@ -97,12 +106,11 @@ class Figure {
 
   void closeFigure() {
     closed = true;
-    float x = 0, y = 0, z = 0;
+    float x = 0, y = 0;
     if (!revolution) {
       for (int i=0;i<nVerteces;i++) {
         x = x + tVerteces[i][0];
         y = y + tVerteces[i][1];
-        z = z + tVerteces[i][2];
       }
       nSteps = 0;
     }
@@ -110,7 +118,6 @@ class Figure {
       float angle = 360;
       x = tVerteces[0][0];
       y = tVerteces[0][1];
-      z = tVerteces[0][2];
       for (int i=1; i<nSteps;i++) {
         for (int k=0;k<nVerteces;k++) {
           verteces[k][0] = verteces[k][0] - width/2;
@@ -137,7 +144,6 @@ class Figure {
           verteces[i*nVerteces+j][3] = tVerteces[j][3];
           x = x + tVerteces[j][0];
           y = y + tVerteces[j][1];
-          z = z + tVerteces[j][2];
         }
       }
       nVerteces = nVerteces * nSteps;
@@ -156,7 +162,7 @@ class Figure {
         else tMatrix[i][j] = 0;
       }
     }
-    centroid = new PVector(x/nVerteces, y/nVerteces, z/nVerteces);
+    centroid = new PVector(x/nVerteces, y/nVerteces);
     
     if (!revolution) return;
     
@@ -342,13 +348,9 @@ class Figure {
     for (int j=0;j<nVerteces;j++) {
       x = x + tVerteces[j][0];
       y = y + tVerteces[j][1];
-      z = z + tVerteces[j][2];
     }
-    centroid = new PVector(x/nVerteces, y/nVerteces, z/nVerteces);
+    centroid = new PVector(x/nVerteces, y/nVerteces);
   }
-  
-
-
   
   void normalizeNormals(){
     for (int i=0;i<nTriangles;i++){
@@ -370,34 +372,36 @@ class Figure {
   }
 
   //TODO Crear funcion miLinea, la cual aparte de dibujar la línea aplica la perspectiva.
-  void draw(float k, boolean triang, boolean norm,boolean pers) {
+                              /*buttonsPressed[6],buttonsPressed[7],buttonsPressed[8]*/
+  void draw(float k, boolean [] options /*boolean triang, boolean norm,boolean pers*/) {
     int i = 0;
     float z = 0, a = 0;
-    if (!closed)for (i=0;i<nVerteces-1;i++) myLine(tVerteces[i], tVerteces[(i+1)], pers);
+    stroke(colour[0],colour[1],colour[2]);
+    if (!closed)for (i=0;i<nVerteces-1;i++) myLine(tVerteces[i], tVerteces[(i+1)], options[8]);
     
     if (closed && !revolution) {
-      myLine(tVerteces[nVerteces-1], tVerteces[0], pers);
-      for (i=0;i<nVerteces-1;i++) myLine(tVerteces[i], tVerteces[(i+1)], pers);
+      myLine(tVerteces[nVerteces-1], tVerteces[0], options[8]);
+      for (i=0;i<nVerteces-1;i++) myLine(tVerteces[i], tVerteces[(i+1)], options[8]);
     }
     if (closed && revolution) {
       for (i=0;i<(nVerteces/nSteps);i++) {
         for (int j=0;j<nSteps;j++) {
-          myLine(tVerteces[(j*(nVerteces/nSteps))+i], tVerteces[((j+1)%nSteps)*(nVerteces/nSteps)+i],pers);  
+          myLine(tVerteces[(j*(nVerteces/nSteps))+i], tVerteces[((j+1)%nSteps)*(nVerteces/nSteps)+i],options[8]);  
           if (i < ((nVerteces/nSteps)-1)){
-            myLine(tVerteces[i+j*(nVerteces/nSteps)], tVerteces[i+j*(nVerteces/nSteps)+1], pers);
+            myLine(tVerteces[i+j*(nVerteces/nSteps)], tVerteces[i+j*(nVerteces/nSteps)+1], options[8]);
           }
         }
       }
-      if(triang){
+      if(options[6]){
         for(int l=0;l<nTriangles;l=l+2){
           //myLine(tVerteces[triangles[l][0]],tVerteces[triangles[l][1]],2);
           //myLine(tVerteces[triangles[l][1]],tVerteces[triangles[l][2]],2);
-          myLine(tVerteces[triangles[l][2]],tVerteces[triangles[l][0]],pers);
+          myLine(tVerteces[triangles[l][2]],tVerteces[triangles[l][0]],options[8]);
           //println("--------------"+l+"-----------------");
           //println("PINTO -> " + triangles[l][2] + " " + triangles[l][0]); 
         }
       }
-      if(norm){
+      if(options[7]){
         for(int l=0;l<nTriangles;l++){
           float [] aux = new float[3];
           aux[0] = tTriangleCentroids[l][0] + tNormals[l][0];
@@ -409,11 +413,11 @@ class Figure {
           //Línea desde el centroide al centroide + vector
           if (tTriangleCentroids[l][2] < aux[2]) stroke(255,0,0);
           else stroke(0,0,255);
-          myLine(tTriangleCentroids[l],aux,pers);
-          stroke(0);
+          myLine(tTriangleCentroids[l],aux,options[8]);
         }        
       }
     }
+    stroke(0);
   }
 
   void translate (float x, float y, float z) {
