@@ -217,21 +217,28 @@ class Figure {
         //Cálculo de la normal
         float [] v43 = new float[3];
         float [] v40 = new float[3];
+        println("VECTOR 43-> " + triangles[triangleIndex][1] + " - " + triangles[triangleIndex][2]);
         v43[0] = verteces[triangles[triangleIndex][1]][0] - verteces[triangles[triangleIndex][2]][0];
         v43[1] = verteces[triangles[triangleIndex][1]][1] - verteces[triangles[triangleIndex][2]][1];
         v43[2] = verteces[triangles[triangleIndex][1]][2] - verteces[triangles[triangleIndex][2]][2];
         
-        
+        println("VECTOR 40 -> " + triangles[triangleIndex][0] + " -  " + triangles[triangleIndex][2]);
         v40[0] = verteces[triangles[triangleIndex][0]][0] - verteces[triangles[triangleIndex][2]][0];
         v40[1] = verteces[triangles[triangleIndex][0]][1] - verteces[triangles[triangleIndex][2]][1];
-        v40[1] = verteces[triangles[triangleIndex][0]][2] - verteces[triangles[triangleIndex][2]][2];
-        println("NORMAL v40 " + v40[0] + " " + v40[1]);
-        println("NORMAL v43 " + v43[0] + " " + v43[1]);
+        v40[2] = verteces[triangles[triangleIndex][0]][2] - verteces[triangles[triangleIndex][2]][2];
+        println("NORMAL v40 " + v40[0] + " " + v40[1] + " " + v40[2]);
+        println("NORMAL v43 " + v43[0] + " " + v43[1] + " " + v43[2]);
         
-        normals[triangleIndex][0] = v43[1] * v40[2] - (v40[1] * v43[2]);
-        normals[triangleIndex][1] = v43[0] * v40[2] - (v40[0] * v43[2]);
-        normals[triangleIndex][2] = v43[0] * v40[1] - (v40[0] * v43[1]);
+        normals[triangleIndex][0] = (v40[1] * v43[2]) - (v43[1] * v40[2]);
+        normals[triangleIndex][1] = (v40[0] * v43[2]) - (v43[0] * v40[2]);
+        normals[triangleIndex][2] = (v40[0] * v43[1]) - (v43[0] * v40[1]);
         println("NORMAL ORIGINAL 0 -> " + normals[triangleIndex][0] + " " + normals[triangleIndex][1] + " " + normals[triangleIndex][2]);
+        
+                             
+        //normals[triangleIndex][0] = normals[triangleIndex][0] + triangleCentroids[triangleIndex][0];
+        //normals[triangleIndex][1] = normals[triangleIndex][1] + triangleCentroids[triangleIndex][1];
+        //normals[triangleIndex][2] = normals[triangleIndex][2] + triangleCentroids[triangleIndex][2];
+        
         float module = sqrt( normals[triangleIndex][0]* normals[triangleIndex][0] +  
                              normals[triangleIndex][1]* normals[triangleIndex][1] + 
                              normals[triangleIndex][2]* normals[triangleIndex][2]);
@@ -279,7 +286,7 @@ class Figure {
         tTriangleCentroids[triangleIndex][1] = tY;
         tTriangleCentroids[triangleIndex][2] = tZ;
         tTriangleCentroids[triangleIndex][3] = 1;
-        println("CENTROIDE " + tX + " " + tY + " " + tZ);
+        //println("CENTROIDE " + tX + " " + tY + " " + tZ);
         
         tX = 0;
         tY = 0;
@@ -291,10 +298,14 @@ class Figure {
         v41[1] = verteces[triangles[triangleIndex][2]][1] - verteces[triangles[triangleIndex][1]][1];
         v41[2] = verteces[triangles[triangleIndex][2]][2] - verteces[triangles[triangleIndex][1]][2];
         
+        println("VECTOR 41 -> " + triangles[triangleIndex][2] + " -  " + triangles[triangleIndex][1]);
+        normals[triangleIndex][0] = (v41[1] * v40[2]) - (v40[1] * v41[2]);
+        normals[triangleIndex][1] = (v41[0] * v40[2]) - (v40[0] * v41[2]);
+        normals[triangleIndex][2] = (v41[0] * v40[1]) - (v40[0] * v41[1]);
         
-        normals[triangleIndex][0] = v40[1] * v41[2] - (v41[1] * v40[2]);
-        normals[triangleIndex][1] = v40[0] * v41[2] - (v41[0] * v40[2]);
-        normals[triangleIndex][2] = v40[0] * v41[1] - (v41[0] * v40[1]);
+        //normals[triangleIndex][0] = normals[triangleIndex][0] + triangleCentroids[triangleIndex][0];
+        //normals[triangleIndex][1] = normals[triangleIndex][1] + triangleCentroids[triangleIndex][1];
+        //normals[triangleIndex][2] = normals[triangleIndex][2] + triangleCentroids[triangleIndex][2];
         
         module = sqrt( normals[triangleIndex][0]* normals[triangleIndex][0] +  
                              normals[triangleIndex][1]* normals[triangleIndex][1] + 
@@ -347,11 +358,11 @@ class Figure {
       tNormals[i][0] = 20*tNormals[i][0]/module;
       tNormals[i][1] = 20*tNormals[i][1]/module;
       tNormals[i][2] = 20*tNormals[i][2]/module;
-      println("MODULE " + module);
+      //println("MODULE " + module);
       module = sqrt( normals[i][0]* normals[i][0] +  
                            normals[i][1]* normals[i][1] + 
                            normals[i][2]* normals[i][2]);
-      println("MODULE " + module);                            
+      //println("MODULE " + module);                            
       normals[i][0] = 20*normals[i][0]/module;
       normals[i][1] = 20*normals[i][1]/module;
       normals[i][2] = 20*normals[i][2]/module;                
@@ -396,7 +407,7 @@ class Figure {
           //println("NORMAL ORIGINAL " + tNormals[l][0] + " " + tNormals[l][1] + " " + tNormals[l][2]);
           //println("NORMAL NUEVA " + aux[0] + " " + aux[1] + " " + aux[2]);
           //Línea desde el centroide al centroide + vector
-          if (tTriangleCentroids[l][2] < tNormals[l][2]) stroke(255,0,0);
+          if (tTriangleCentroids[l][2] < aux[2]) stroke(255,0,0);
           else stroke(0,0,255);
           myLine(tTriangleCentroids[l],aux,pers);
           stroke(0);
@@ -428,6 +439,9 @@ class Figure {
     tMatrix = multiplyMatrix(tMatrix,T, 4, 4, 4);
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
     tTriangleCentroids = multiplyMatrix(triangleCentroids, tMatrix, nTriangles, 4, 4);
+    
+    tMatrixNormals = multiplyMatrix(tMatrixNormals,T, 4, 4, 4);
+
     updateCentroid();
     normalizeNormals();
 
@@ -477,6 +491,7 @@ class Figure {
     
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
     tTriangleCentroids = multiplyMatrix(triangleCentroids, tMatrix, nTriangles, 4, 4);
+    
 
     T[3][0] = -(iniRotX-width/2.);
     T[3][1] = -(iniRotY-height/2.);
@@ -536,7 +551,11 @@ class Figure {
 
     tMatrix = multiplyMatrix(tMatrix, aux, 4, 4, 4);
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
-    updateCentroid();
+    tTriangleCentroids = multiplyMatrix(triangleCentroids, tMatrix, nTriangles, 4, 4);
     
+    tNormals = multiplyMatrix(normals, tMatrixNormals, nTriangles, 4, 4);
+    
+    updateCentroid();
+    normalizeNormals();
   }
 }
