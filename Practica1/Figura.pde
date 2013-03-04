@@ -394,7 +394,7 @@ class Figure implements Drawable{
     for (i=0;i<nVerteces;i++) { 
       tVerteces[i][0] = tVerteces[i][0]/(1.-(tVerteces[i][2]/k));
       tVerteces[i][1] = tVerteces[i][1]/(1.-(tVerteces[i][2]/k));
-      //tVerteces[i][2] = tVerteces[i][2]/(1-(tVerteces[i][2]/k));
+      tVerteces[i][2] = tVerteces[i][2]/(1-(tVerteces[i][2]/k));
     }
 
     for (i=0;i<nVerteces;i++) {

@@ -247,12 +247,18 @@ void mouseDragged() {
         if (selectedFigure != -1){
           figure = (Figure)figures.get(selectedFigure);
           figure.rotateX((prevDragY-dragY)*0.02, iniPressedX,iniPressedY); 
-        }      
+          if (buttonsPressed[8]){
+            figure.applyPerspective(k);
+          }
+        }    
       }
       if (buttonsPressed[4]){
         if (selectedFigure != -1){
           figure = (Figure)figures.get(selectedFigure);
           figure.translate(-prevDragX+dragX, -prevDragY+dragY, 0);
+          if (buttonsPressed[8]){
+            figure.applyPerspective(k);
+          }
         }
       }
       if (buttonsPressed[5]){
@@ -260,14 +266,12 @@ void mouseDragged() {
         if (selectedFigure != -1){
           figure = (Figure)figures.get(selectedFigure);
           figure.rotateY((prevDragX-dragX)*0.02, iniPressedX,iniPressedY); 
-        }   
-      }
-      if (buttonsPressed[8]){
-        for (int l = figures.size()-1;l>=0;l--) {
-          figure = (Figure)figures.get(l);
-          figure.applyPerspective(k);
+          if (buttonsPressed[8]){
+            figure.applyPerspective(k);
+          }
         }
       }
+
   prevDragX = mouseX;
   prevDragY = mouseY;  
 

@@ -12,11 +12,37 @@ float [][] multiplyMatrix(float v[][], float R[][], int n1, int  m1, int m2) {
   return M;
 }
 
+void arrayCopyFtD(float [] from,double [] to, int n){
+  for (int i=0;i<n;i++) to[i] = from[i];
+}
+
 double [] prodVect(double [] u, double [] v) {
   double [] res = new double[3];
   res[0] = u[1]*v[2] - (v[1]*u[2]);
   res[1] = -(u[0]*v[2] - (v[0]*u[2]));
   res[2] = u[0]*v[1] - (v[0]*u[1]);
+  return res;
+}
+
+double prodEsc(double [] u, double [] v) {
+  double res;
+  res = u[0]*v[0]+u[1]*v[1]+u[2]*v[2];
+  return res;
+}
+
+double [] sub(double [] u, double [] v){
+  double [] res = new double[3];
+  res[0] = u[0] - v[0];
+  res[1] = u[1] - v[1];
+  res[2] = u[2] - v[2];
+  return res;
+}
+
+double [] add(double [] u, double [] v){
+  double [] res = new double[3];
+  res[0] = u[0] + v[0];
+  res[1] = u[1] + v[1];
+  res[2] = u[2] + v[2];
   return res;
 }
 
@@ -32,11 +58,11 @@ void rayTracing(ArrayList figures, float viewerZ){
     //Para cada pixel X = i, Y = j;
     //Determinar el rayo que va desde el observador
     //p = p0 +t*(x1-x0)
-      PVector p0 = new PVector(0,0,viewerZ);
-      PVector inc = new PVector(i,j,-k);
-      PVector p;
-      float T = MAX_FLOAT;
-      float t;
+      double [] p0 = {0,0,viewerZ};
+      double [] inc = {i,j,-viewerZ};
+      double [] p = new double[3];
+      double T = MAX_FLOAT;
+      double t;
       Figure figure;
       int nearestObject = -1;
       for (int k = 0;k<figures.size();k++) {
@@ -44,42 +70,41 @@ void rayTracing(ArrayList figures, float viewerZ){
         //Calcular las intersección/es y almacenarla si es más cercana al observador
         figure = (Figure)figures.get(k);               
         //Obtenemos a, b y c (triangles -> a = [0], b = [1], c = [2])
-        PVector a = new PVector(0,0,0);
-        PVector b = new PVector(0,0,0);
-        PVector c = new PVector(0,0,0);
+        double [] a = new double[3];
+        double [] b = new double[3];
+        double [] c = new double[3];
         
-        float [] plane = new float[4];//[0]x+[1]y+[2]z+[3] = 0
+        double [] plane = new double[4];//[0]x+[1]y+[2]z+[3] = 0
         //Para cada triangulo comprobamos donde cae el punto, comparamos con
         // la T anterior y nos quedamos con la menor T, y el polígono al que pertenece
         for (int l=0;l<figure.triangles();l++){
           //Interseccion
-          a.set(figure.tVerteces[figure.triangles[l][0]]);
-          b.set(figure.tVerteces[figure.triangles[l][1]]);
-          c.set(figure.tVerteces[figure.triangles[l][2]]);
+          arrayCopyFtD(figure.tVerteces[figure.triangles[l][0]],a,3);
+          arrayCopyFtD(figure.tVerteces[figure.triangles[l][1]],b,3);
+          arrayCopyFtD(figure.tVerteces[figure.triangles[l][2]],c,3);
+
           //Calculamos el plano
-          PVector vBA = new PVector(0,0,0);
-          PVector vBC = new PVector(0,0,0);
-          vBA = PVector.sub(a,b);
-          vBC = PVector.sub(c,b);
-          vBC = vBA.cross(vBC);
-          plane[0] = vBC.x;
-          plane[1] = vBC.y;
-          plane[2] = vBC.z;
-          plane[3] = -plane[0]*c.x-
-                        plane[1]*c.y-
-                          plane[2]*c.z;
+          double [] vBA = sub(a,b);
+          double [] vBC = sub(c,b);
+          vBC = prodVect(vBA,vBC);
+          plane[0] = vBC[0];//figure.tNormals[l][0]-figure.tTriangleCentroids[l][0];//
+          plane[1] = vBC[1];//figure.tNormals[l][1]-figure.tTriangleCentroids[l][1];//
+          plane[2] = vBC[2];//figure.tNormals[l][2]-figure.tTriangleCentroids[l][2];//
+          plane[3] = -plane[0]*a[0]-
+                        plane[1]*a[1]-
+                          plane[2]*a[2];
                           
-          /*float sA,sB,sC;
-          sA = plane[0]*a.x+plane[1]*a.y+plane[2]*a.z+plane[3];
-          sB = plane[0]*b.x+plane[1]*b.y+plane[2]*b.z+plane[3];
-          sC = plane[0]*c.x+plane[1]*c.y+plane[2]*c.z+plane[3];
-          */
-          /*if((sA !=0)||(sB!=0)||(sC!=0)){
+          /*double sA,sB,sC;
+          sA = plane[0]*a[0]+plane[1]*a[1]+plane[2]*a[2]+plane[3];
+          sB = plane[0]*b[0]+plane[1]*b[1]+plane[2]*b[2]+plane[3];
+          sC = plane[0]*c[0]+plane[1]*c[1]+plane[2]*c[2]+plane[3];
+          
+          if((sA !=0)||(sB!=0)||(sC!=0)){
             println("ERROR " + sA+" "+sB+" "+sC);
             println("PLANO A = "+plane[0] +"; B = "+plane[1] + "; C = " + plane[2] + "; D = "+ plane[3]);
-            println("Punto a aX = "+a.x+"; aY = "+a.y+"; aZ = "+a.z+";");
-            println("Punto b bX = "+b.x+"; bY = "+b.y+"; bZ = "+b.z+";");
-            println("Punto c cX = "+c.x+"; cY = "+c.y+"; cZ = "+c.z+";");
+            println("Punto a aX = "+a[0]+"; aY = "+a[1]+"; aZ = "+a[2]+";");
+            println("Punto b bX = "+b[0]+"; bY = "+b[1]+"; bZ = "+b[2]+";");
+            println("Punto c cX = "+c[0]+"; cY = "+c[1]+"; cZ = "+c[2]+";");
             return;
           }*/
           /*println("PLANO A = "+plane[0] +"; B = "+plane[1] + "; C = " + plane[2] + "; D = "+ plane[3]);
@@ -87,47 +112,31 @@ void rayTracing(ArrayList figures, float viewerZ){
           println("Punto b bX = "+b.x+"; bY = "+b.y+"; bZ = "+b.z+";");
           println("Punto c cX = "+c.x+"; cY = "+c.y+"; cZ = "+c.z+";");*/
           //Calculamos la interseccion entre recta y plano
-          t = -((plane[0]*p0.x+plane[1]*p0.y+plane[2]*p0.z+plane[3])/(plane[0]*inc.x+plane[1]*inc.y+plane[2]*inc.z));
+          t = -((plane[0]*p0[0]+plane[1]*p0[1]+plane[2]*p0[2]+plane[3])/(plane[0]*inc[0]+plane[1]*inc[1]+plane[2]*inc[2]));
           //Tenemos el punto de intersección (p = p0 + T*inc)
-          p = inc.get();
-          p.mult(t);
-          p.add(p0);
+          p[0] = p0[0] + inc[0]*t;
+          p[1] = p0[1] + inc[1]*t;
+          p[2] = p0[2] + inc[2]*t;
+
           //println("Punto p pX = "+p.x+";pY  = "+p.y+";pZ  = "+p.z+";");
 
-          PVector aux1 = new PVector(0,0,0);
-          PVector aux2 = new PVector(0,0,0);
-          PVector auxR1 = new PVector(0,0,0);
-          PVector auxR2 = new PVector(0,0,0);
-          PVector auxR3 = new PVector(0,0,0);
-          PVector auxN = new PVector(0,0,0);
 
+          double [] auxR1;
+          double [] auxR2;
+          double [] auxR3;
+          double [] auxN;
           //auxR1 = (b-a)x(p-a)
-          aux1 = b.get();
-          aux1.sub(a);
-          aux2 = p.get();
-          aux2.sub(a);
-          auxR1 = aux1.get();
-          auxR1 = auxR1.cross(aux2);
+          auxR1 = prodVect(sub(b,a),sub(p,a));
           //auxR2 = (c-b)x(p-b)
-          aux1 = c.get();
-          aux1.sub(b);
-          aux2 = p.get();
-          aux2.sub(b);
-          auxR2 = aux1.get();
-          auxR2 = auxR2.cross(aux2);
+          auxR2 = prodVect(sub(c,b),sub(p,b));
           //auxR3 = (a-c)x(p-c)
-          aux1 = a.get();
-          aux1.sub(c);
-          aux2 = p.get();
-          aux2.sub(c);
-          auxR3 = aux1.get();
-          auxR3 = auxR3.cross(aux2);
+          auxR3 = prodVect(sub(a,c),sub(p,c));
           //Copiamos la normal para hacer el producto escalar
-          auxN.set(figure.tNormals[l]);
-          float r1,r2,r3;
-          r1 = auxN.dot(auxR1);
-          r2 = auxN.dot(auxR2);
-          r3 = auxN.dot(auxR3);
+          //vBC contenía la normal
+          double r1,r2,r3;
+          r1 = prodEsc(vBC,auxR1);
+          r2 = prodEsc(vBC,auxR2);
+          r3 = prodEsc(vBC,auxR3);
 
           if ((r1 == 0)||(r2 == 0)||(r3 == 0))
                 
@@ -172,7 +181,7 @@ void rayTracing(ArrayList figures, float viewerZ){
       }
       if(nearestObject!=-1)
       {
-        println("PIXEL " + i + " " + j);
+        //println("PIXEL " + i + " " + j);
 
         //Pintar el píxel con el color apropiado, es decir, el del objeto más cercano
         figure = (Figure)figures.get(nearestObject);
