@@ -64,27 +64,39 @@ void draw() {
   line(width/2, height/2, (width/2)+60, height/2);
   line(width/2, height/2, width/2, height/2-60);
   stroke(0);
-  
+
   if (figures.size() == 0) return;
-  
+  Figure figure;
   if (buttonsPressed[9]) {
-  //A Pintar con trazado de rayos
+    //A Pintar con trazado de rayos
     println("A POR LOS RAYOS");
-    rayTracing(figures,k);
+    for (int l = figures.size()-1;l>=0;l--) {
+      figure = (Figure)figures.get(l);
+      figure.translate(0, 0, 0);
+    }
+    
+    rayTracing(figures, k, buttonsPressed[8]);
+    
+    if (buttonsPressed[8]) {
+      for (int l = figures.size()-1;l>=0;l--) {
+        figure = (Figure)figures.get(l);
+        figure.applyPerspective(k);
+      }
+    }
     println("FIN RAYOS");
   }
-    if (cube != null) cube.draw(k,buttonsPressed);
-    for (i = cubes.size()-1;i>=0;i--) {
-      Cube cube = (Cube)cubes.get(i);
-      cube.draw(k,buttonsPressed);
-    }
-    for (i = figures.size()-1;i>=0;i--) {
-      Figure figure = (Figure)figures.get(i);
-      if (i == selectedFigure) strokeWeight(2);
-      figure.draw(k,buttonsPressed /*buttonsPressed[6],buttonsPressed[7],buttonsPressed[8]*/);
-      strokeWeight(1);
-    }
-  
+  if (cube != null) cube.draw(k, buttonsPressed);
+  for (i = cubes.size()-1;i>=0;i--) {
+    Cube cube = (Cube)cubes.get(i);
+    cube.draw(k, buttonsPressed);
+  }
+  for (i = figures.size()-1;i>=0;i--) {
+    figure = (Figure)figures.get(i);
+    if (i == selectedFigure) strokeWeight(2);
+    figure.draw(k, buttonsPressed /*buttonsPressed[6],buttonsPressed[7],buttonsPressed[8]*/);
+    strokeWeight(1);
+  }
+
   //println("x = " + mouseX + " y = " + mouseY);
 }
 
@@ -101,16 +113,16 @@ void mousePressed() {
         else fill(90, 90, 90);
         rect(buttons[i][0], buttons[i][1], buttonWidth, buttonHeight);
         fill(0);
-        if ((i==8)&&(buttonsPressed[i])){
+        if ((i==8)&&(buttonsPressed[i])) {
           for (int l = figures.size()-1;l>=0;l--) {
             figure = (Figure)figures.get(l);
             figure.applyPerspective(k);
           }
         }
-        else if (i==8){
+        else if (i==8) {
           for (int l = figures.size()-1;l>=0;l--) {
             figure = (Figure)figures.get(l);
-            figure.translate(0,0,0);
+            figure.translate(0, 0, 0);
           }
         }
         return;
@@ -121,7 +133,7 @@ void mousePressed() {
     selectedFigure = -1;
     for (int i=0;i<figures.size();i++) {
       figure = (Figure)figures.get(i);
-      if (figure.closed()){
+      if (figure.closed()) {
         float dist = actualPos.dist(figure.getCentroid());
         if (dist < min) {
           min = dist;
@@ -177,7 +189,7 @@ void mousePressed() {
           break;
         case 8:
           println("8 PULSADO");
-        break;
+          break;
         case 10:
           if (selectedFigure!=-1)figures.remove(selectedFigure);
           break;
@@ -232,47 +244,47 @@ void mouseReleased() {
 void mouseDragged() {
   dragX = mouseX;
   dragY = mouseY;
-     Figure figure;
-        //Boton de crear Cubo
-      if (buttonsPressed[0]){
-          PVector v0 = new PVector(iniPressedX, iniPressedY, 0);
-          PVector v2 = new PVector(dragX, dragY, 0);
-        cube = new Cube(v0, v2);
-      }
-        //Boton de crear Figura
+  Figure figure;
+  //Boton de crear Cubo
+  if (buttonsPressed[0]) {
+    PVector v0 = new PVector(iniPressedX, iniPressedY, 0);
+    PVector v2 = new PVector(dragX, dragY, 0);
+    cube = new Cube(v0, v2);
+  }
+  //Boton de crear Figura
 
-        //Boton de rotar en X
-      if (buttonsPressed[2]){
-        if (cube != null) cube.rotateX((prevDragY-dragY)*0.02, iniPressedX, iniPressedY);  
-        if (selectedFigure != -1){
-          figure = (Figure)figures.get(selectedFigure);
-          figure.rotateX((prevDragY-dragY)*0.02, iniPressedX,iniPressedY); 
-          if (buttonsPressed[8]){
-            figure.applyPerspective(k);
-          }
-        }    
+  //Boton de rotar en X
+  if (buttonsPressed[2]) {
+    if (cube != null) cube.rotateX((prevDragY-dragY)*0.02, iniPressedX, iniPressedY);  
+    if (selectedFigure != -1) {
+      figure = (Figure)figures.get(selectedFigure);
+      figure.rotateX((prevDragY-dragY)*0.02, iniPressedX, iniPressedY); 
+      if (buttonsPressed[8]) {
+        figure.applyPerspective(k);
       }
-      if (buttonsPressed[4]){
-        if (selectedFigure != -1){
-          figure = (Figure)figures.get(selectedFigure);
-          figure.translate(-prevDragX+dragX, -prevDragY+dragY, 0);
-          if (buttonsPressed[8]){
-            figure.applyPerspective(k);
-          }
-        }
+    }
+  }
+  if (buttonsPressed[4]) {
+    if (selectedFigure != -1) {
+      figure = (Figure)figures.get(selectedFigure);
+      figure.translate(-prevDragX+dragX, -prevDragY+dragY, 0);
+      if (buttonsPressed[8]) {
+        figure.applyPerspective(k);
       }
-      if (buttonsPressed[5]){
-        if (cube != null) cube.rotateX((prevDragY-dragY)*0.02, iniPressedX, iniPressedY); 
-        if (selectedFigure != -1){
-          figure = (Figure)figures.get(selectedFigure);
-          figure.rotateY((prevDragX-dragX)*0.02, iniPressedX,iniPressedY); 
-          if (buttonsPressed[8]){
-            figure.applyPerspective(k);
-          }
-        }
+    }
+  }
+  if (buttonsPressed[5]) {
+    if (cube != null) cube.rotateX((prevDragY-dragY)*0.02, iniPressedX, iniPressedY); 
+    if (selectedFigure != -1) {
+      figure = (Figure)figures.get(selectedFigure);
+      figure.rotateY((prevDragX-dragX)*0.02, iniPressedX, iniPressedY); 
+      if (buttonsPressed[8]) {
+        figure.applyPerspective(k);
       }
+    }
+  }
 
   prevDragX = mouseX;
-  prevDragY = mouseY;  
-
+  prevDragY = mouseY;
 }
+

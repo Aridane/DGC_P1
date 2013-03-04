@@ -76,11 +76,11 @@ class Cube {
     }
     centroid = new PVector( x/8, y/8, z/8);
   }
-  
-  int type(){
+
+  int type() {
     return type;
   }
-  boolean closed(){
+  boolean closed() {
     return true;
   }
   void setverteces(PVector [] v) {
@@ -176,7 +176,6 @@ class Cube {
     }
   }
 }
-
 
 
 
