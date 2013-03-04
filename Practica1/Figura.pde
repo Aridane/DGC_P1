@@ -29,20 +29,6 @@ class Figure implements Drawable{
       0, 0, 0, 1
     }
   };
-  float [][] tMatrixNormals = {
-    {
-      1, 0, 0, 0
-    }
-    , {
-      0, 1, 0, 0
-    }
-    , {
-      0, 0, 1, 0
-    }
-    , {
-      0, 0, 0, 1
-    }
-  };
 
   PVector centroid;
   
@@ -69,6 +55,10 @@ class Figure implements Drawable{
 
   int type(){
     return type;
+  }
+  
+  int triangles(){
+    return nTriangles;
   }
 
   void setVertex(int n, float x, float y, float z) {
@@ -244,14 +234,7 @@ class Figure implements Drawable{
         normals[triangleIndex][0] = normals[triangleIndex][0] + triangleCentroids[triangleIndex][0];
         normals[triangleIndex][1] = normals[triangleIndex][1] + triangleCentroids[triangleIndex][1];
         normals[triangleIndex][2] = normals[triangleIndex][2] + triangleCentroids[triangleIndex][2];
-        
-        float module = sqrt( normals[triangleIndex][0]* normals[triangleIndex][0] +  
-                             normals[triangleIndex][1]* normals[triangleIndex][1] + 
-                             normals[triangleIndex][2]* normals[triangleIndex][2]);
-                             
-        //normals[triangleIndex][0] = normals[triangleIndex][0]/module;
-        //normals[triangleIndex][1] = normals[triangleIndex][1]/module;
-        //normals[triangleIndex][2] = normals[triangleIndex][2]/module;
+
         normals[triangleIndex][3] = 1;
         
         tNormals[triangleIndex][0] = normals[triangleIndex][0];
@@ -312,14 +295,7 @@ class Figure implements Drawable{
         normals[triangleIndex][0] = normals[triangleIndex][0] + triangleCentroids[triangleIndex][0];
         normals[triangleIndex][1] = normals[triangleIndex][1] + triangleCentroids[triangleIndex][1];
         normals[triangleIndex][2] = normals[triangleIndex][2] + triangleCentroids[triangleIndex][2];
-        
-        module = sqrt( normals[triangleIndex][0]* normals[triangleIndex][0] +  
-                             normals[triangleIndex][1]* normals[triangleIndex][1] + 
-                             normals[triangleIndex][2]* normals[triangleIndex][2]);
-                             
-        //normals[triangleIndex][0] = normals[triangleIndex][0]/module;
-        //normals[triangleIndex][1] = normals[triangleIndex][1]/module;
-        //normals[triangleIndex][2] = normals[triangleIndex][2]/module;
+
         normals[triangleIndex][3] = 1;
         
         tNormals[triangleIndex][0] = normals[triangleIndex][0];
@@ -331,11 +307,6 @@ class Figure implements Drawable{
         triangleIndex = triangleIndex + 1;
       }
     }
-    /*for (int i=0;i<nTriangles;i++){
-      normals[i][0] = normals[i][0]*20 + triangleCentroids[i][0];
-      normals[i][1] = normals[i][1]*20 + triangleCentroids[i][1];
-      normals[i][2] = normals[i][2]*20 + triangleCentroids[i][2];
-    }*/
     normalizeNormals();
   }
   
@@ -359,15 +330,7 @@ class Figure implements Drawable{
                            tNormals[i][2]* tNormals[i][2]); 
       tNormals[i][0] = 20*tNormals[i][0]/module + tTriangleCentroids[i][0];
       tNormals[i][1] = 20*tNormals[i][1]/module + tTriangleCentroids[i][1];
-      tNormals[i][2] = 20*tNormals[i][2]/module + tTriangleCentroids[i][2];
-      println("MODULE " + module);
-      /*module = sqrt( normals[i][0]* normals[i][0] +  
-                           normals[i][1]* normals[i][1] + 
-                           normals[i][2]* normals[i][2]);
-      println("MODULE " + module);                            
-      normals[i][0] = 20*normals[i][0]/module;
-      normals[i][1] = 20*normals[i][1]/module;
-      normals[i][2] = 20*normals[i][2]/module;    */            
+      tNormals[i][2] = 20*tNormals[i][2]/module + tTriangleCentroids[i][2]; 
     }
   }
 
@@ -377,6 +340,7 @@ class Figure implements Drawable{
     int i = 0;
     float z = 0, a = 0;
     stroke(colour[0],colour[1],colour[2]);
+    stroke(0);
     if (!closed)for (i=0;i<nVerteces-1;i++) myLine(tVerteces[i], tVerteces[(i+1)], options[8]);
     
     if (closed && !revolution) {
@@ -420,6 +384,25 @@ class Figure implements Drawable{
     stroke(0);
   }
 
+  void applyPerspective(float k){
+    int i;
+    for (i=0;i<nVerteces;i++) {
+      tVerteces[i][0] = tVerteces[i][0] - width/2.;
+      tVerteces[i][1] = tVerteces[i][1] - height/2.;
+    }
+
+    for (i=0;i<nVerteces;i++) { 
+      tVerteces[i][0] = tVerteces[i][0]/(1.-(tVerteces[i][2]/k));
+      tVerteces[i][1] = tVerteces[i][1]/(1.-(tVerteces[i][2]/k));
+      //tVerteces[i][2] = tVerteces[i][2]/(1-(tVerteces[i][2]/k));
+    }
+
+    for (i=0;i<nVerteces;i++) {
+      tVerteces[i][0] = tVerteces[i][0] + width/2.;
+      tVerteces[i][1] = tVerteces[i][1] + height/2.;
+    }
+  }
+
   void translate (float x, float y, float z) {
     //Traslación 
     float [][] T = {
@@ -443,8 +426,6 @@ class Figure implements Drawable{
     tMatrix = multiplyMatrix(tMatrix,T, 4, 4, 4);
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
     tTriangleCentroids = multiplyMatrix(triangleCentroids, tMatrix, nTriangles, 4, 4);
-    
-    //tMatrixNormals = multiplyMatrix(tMatrixNormals,T, 4, 4, 4);
     tNormals = multiplyMatrix(normals,tMatrix, nTriangles, 4, 4);
     
     updateCentroid();
@@ -496,14 +477,6 @@ class Figure implements Drawable{
     
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
     tTriangleCentroids = multiplyMatrix(triangleCentroids, tMatrix, nTriangles, 4, 4);
-    
-    /*T[3][0] = -(iniRotX-width/2.);
-    T[3][1] = -(iniRotY-height/2.);
-    aux = multiplyMatrix(T, Rx, 4, 4, 4);
-    T[3][0] = (iniRotX-width/2.);
-    T[3][1] = (iniRotY-height/2.);
-    aux = multiplyMatrix(aux ,T, 4, 4, 4);*/
-    //tMatrixNormals = multiplyMatrix(tMatrixNormals,aux, 4, 4, 4);
     tNormals = multiplyMatrix(normals,tMatrix, nTriangles, 4, 4);
 
 
@@ -556,15 +529,7 @@ class Figure implements Drawable{
     tMatrix = multiplyMatrix(tMatrix, aux, 4, 4, 4);
     tVerteces = multiplyMatrix(verteces, tMatrix, nVerteces, 4, 4);
     tTriangleCentroids = multiplyMatrix(triangleCentroids, tMatrix, nTriangles, 4, 4);
-    
-    T[3][0] = -(iniRotX-width/2.);
-    T[3][1] = -(iniRotY-height/2.);
-    aux = multiplyMatrix(T, Ry, 4, 4, 4);
-    T[3][0] = (iniRotX-width/2.);
-    T[3][1] = (iniRotY-height/2.);
-    aux = multiplyMatrix(aux,T, 4, 4, 4);
-    tMatrixNormals = multiplyMatrix(tMatrixNormals,aux, 4, 4, 4);
-    tNormals = multiplyMatrix(normals, tMatrixNormals, nTriangles, 4, 4);
+    tNormals = multiplyMatrix(normals,tMatrix, nTriangles, 4, 4);
     
     updateCentroid();
     normalizeNormals();

@@ -6,6 +6,8 @@ int selectedFigure = -1;
 ArrayList figures = new ArrayList();
 ArrayList cubes = new ArrayList();
 
+boolean doom = false;
+
 float k = 800;
 
 int nButtons = 11;
@@ -43,7 +45,6 @@ void setup() {
 
 void draw() {
   background(128, 128, 128);
-
   int i = 0, j;
   for (i=0;i<nButtons;i++) {
 
@@ -68,9 +69,10 @@ void draw() {
   
   if (buttonsPressed[9]) {
   //A Pintar con trazado de rayos
-    rayTracing(figures);
+    println("A POR LOS RAYOS");
+    rayTracing(figures,k);
+    println("FIN RAYOS");
   }
-  else {
     if (cube != null) cube.draw(k,buttonsPressed);
     for (i = cubes.size()-1;i>=0;i--) {
       Cube cube = (Cube)cubes.get(i);
@@ -82,12 +84,13 @@ void draw() {
       figure.draw(k,buttonsPressed /*buttonsPressed[6],buttonsPressed[7],buttonsPressed[8]*/);
       strokeWeight(1);
     }
-  }
+  
   //println("x = " + mouseX + " y = " + mouseY);
 }
 
 void mousePressed() {
   if (mouseButton == LEFT) {
+    Figure figure;
     for (int i=0;i<nButtons;i++) {
       //Podemos estar pulsando un boton
       if (mouseX > buttons[i][0] && mouseX < buttons[i][0] + buttonWidth &&
@@ -98,12 +101,23 @@ void mousePressed() {
         else fill(90, 90, 90);
         rect(buttons[i][0], buttons[i][1], buttonWidth, buttonHeight);
         fill(0);
+        if ((i==8)&&(buttonsPressed[i])){
+          for (int l = figures.size()-1;l>=0;l--) {
+            figure = (Figure)figures.get(l);
+            figure.applyPerspective(k);
+          }
+        }
+        else if (i==8){
+          for (int l = figures.size()-1;l>=0;l--) {
+            figure = (Figure)figures.get(l);
+            figure.translate(0,0,0);
+          }
+        }
         return;
       }
     }
     PVector actualPos = new PVector(mouseX, mouseY);
-    Figure figure;
-    float min = 999999;
+    float min = MAX_FLOAT;
     selectedFigure = -1;
     for (int i=0;i<figures.size();i++) {
       figure = (Figure)figures.get(i);
@@ -118,6 +132,7 @@ void mousePressed() {
     for (int i=0;i<nButtons;i++) {
       //Estar haciendo click IZQUIERDO con el boton activado
       if (buttonsPressed[i]) {
+        println("BUTTONPRESSED" + " " + i);
         switch(i) {
           //Boton de crear Cubo
         case 0:
@@ -160,8 +175,12 @@ void mousePressed() {
           prevDragX = mouseX;
           prevDragY = mouseY;
           break;
+        case 8:
+          println("8 PULSADO");
+        break;
         case 10:
-          figures.remove(selectedFigure);
+          if (selectedFigure!=-1)figures.remove(selectedFigure);
+          break;
         }
       }
     }
@@ -242,6 +261,12 @@ void mouseDragged() {
           figure = (Figure)figures.get(selectedFigure);
           figure.rotateY((prevDragX-dragX)*0.02, iniPressedX,iniPressedY); 
         }   
+      }
+      if (buttonsPressed[8]){
+        for (int l = figures.size()-1;l>=0;l--) {
+          figure = (Figure)figures.get(l);
+          figure.applyPerspective(k);
+        }
       }
   prevDragX = mouseX;
   prevDragY = mouseY;  
