@@ -32,8 +32,8 @@ void rayTracing(ArrayList figures, float viewerZ){
     //Para cada pixel X = i, Y = j;
     //Determinar el rayo que va desde el observador
     //p = p0 +t*(x1-x0)
-      PVector p0 = new PVector(0,0,viewerZ);
-      PVector inc = new PVector(i,j,-k);
+      PVector p0 = new PVector(width/2.,height/2.,viewerZ);
+      PVector inc = new PVector(i-p0.x,j-p0.y,-k);
       PVector p;
       float T = MAX_FLOAT;
       float t;
