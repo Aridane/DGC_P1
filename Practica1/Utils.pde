@@ -58,8 +58,8 @@ void rayTracing(ArrayList figures, float viewerZ){
     //Para cada pixel X = i, Y = j;
     //Determinar el rayo que va desde el observador
     //p = p0 +t*(x1-x0)
-      double [] p0 = {0,0,viewerZ};
-      double [] inc = {i,j,-viewerZ};
+      double [] p0 = {width/2.,height/2.,viewerZ};
+      double [] inc = {i-p0[0],j-p0[1],-viewerZ};
       double [] p = new double[3];
       double T = MAX_FLOAT;
       double t;
