@@ -1,6 +1,9 @@
 float iniX, iniY, dragX, dragY;
 Cube cube;
 
+float [] light = {800,50,500};
+double [] normalizedLight = new double[3];
+
 int selectedFigure = -1;
 
 ArrayList figures = new ArrayList();
@@ -10,11 +13,11 @@ boolean doom = false;
 
 float k = 800;
 
-int nButtons = 11;
+int nButtons = 12;
 float [][] buttons = new float[nButtons][2];
 boolean [] buttonsPressed = new boolean[nButtons];
 String [] buttonsText = {
-  "Cubo", "Fig", "RotX", "Rev", "Tr", "RotY", "Triangles", "Normals", "Persp", "Rayos", "Del"
+  "Cubo", "Fig", "RotX", "Rev", "Tr", "RotY", "Triangles", "Normals", "Persp", "Rayos", "Del", "Iluminación"
 };
 float buttonWidth = 90;
 float buttonHeight = 20;
@@ -32,7 +35,8 @@ void setup() {
   size(800, 640);
   stroke(0);
   background(128, 128, 128);
-
+ 
+  
   loop();
   Cube cube = null;
 
@@ -59,7 +63,7 @@ void draw() {
 
     text(buttonsText[i], buttons[i][0]+15, buttons[i][1]+15, -1);
   }   
-
+  rect(light[0],light[1],50,50);
   stroke(255, 0, 0);
   line(width/2, height/2, (width/2)+60, height/2);
   line(width/2, height/2, width/2, height/2-60);
@@ -75,7 +79,7 @@ void draw() {
       figure.translate(0, 0, 0);
     }
     
-    rayTracing(figures, k, buttonsPressed[8]);
+    rayTracing(figures, k, buttonsPressed);
     
     if (buttonsPressed[8]) {
       for (int l = figures.size()-1;l>=0;l--) {
@@ -96,7 +100,9 @@ void draw() {
     figure.draw(k, buttonsPressed /*buttonsPressed[6],buttonsPressed[7],buttonsPressed[8]*/);
     strokeWeight(1);
   }
+  stroke (0);
 
+  
   //println("x = " + mouseX + " y = " + mouseY);
 }
 

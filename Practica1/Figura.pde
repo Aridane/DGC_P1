@@ -36,7 +36,7 @@ class Figure implements Drawable {
 
   boolean revolution = false;
 
-  int nSteps = 4;
+  int nSteps = 10;
 
   boolean closed = false;
 

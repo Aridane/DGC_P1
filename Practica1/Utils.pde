@@ -52,7 +52,7 @@ void myLine(float [] v0, float [] v1, boolean p) {
   line(aux0X, aux0Y, aux1X, aux1Y);
 }
 
-void rayTracing(ArrayList figures, float viewerZ, boolean persp) {
+void rayTracing(ArrayList figures, float viewerZ, boolean [] options) {
   for (int i=0;i<width;i++) {
     for (int j=0;j<height;j++) {
       //Para cada pixel X = i, Y = j;
@@ -60,7 +60,9 @@ void rayTracing(ArrayList figures, float viewerZ, boolean persp) {
       //p = p0 +t*(x1-x0)
       double [] p0 = new double[3];
       double [] inc = new double[3];
-      if (!persp) {
+      double [] triangleNormal = new double[3];
+      double [] triangleCentroid = new double[3];
+      if (!options[8]) {
         //println("SIN PERSPECTIVA");
         p0[0] = i;
         p0[1] = j;
@@ -101,7 +103,7 @@ void rayTracing(ArrayList figures, float viewerZ, boolean persp) {
           //Calculamos el plano
           double [] vBA = sub(a, b);
           double [] vBC = sub(c, b);
-          vBC = prodVect(vBA, vBC);
+          vBC = prodVect(vBC, vBA);
           plane[0] = vBC[0];//figure.tNormals[l][0]-figure.tTriangleCentroids[l][0];//
           plane[1] = vBC[1];//figure.tNormals[l][1]-figure.tTriangleCentroids[l][1];//
           plane[2] = vBC[2];//figure.tNormals[l][2]-figure.tTriangleCentroids[l][2];//
@@ -161,6 +163,13 @@ void rayTracing(ArrayList figures, float viewerZ, boolean persp) {
             if (t<T) {
               T = t;
               nearestObject = k;
+              triangleNormal[0] = vBC[0];
+              triangleNormal[1] = vBC[1];
+              triangleNormal[2] = vBC[2];
+              triangleCentroid[0] = figure.tTriangleCentroids[l][0];
+              triangleCentroid[1] = figure.tTriangleCentroids[l][1];
+              triangleCentroid[2] = figure.tTriangleCentroids[l][2];
+              
               /*  r1 = plane[0]*a.x+plane[1]*a.y+plane[2]*a.z+plane[3];
                r2 = plane[0]*b.x+plane[1]*b.y+plane[2]*b.z+plane[3];
                r3 = plane[0]*c.x+plane[1]*c.y+plane[2]*c.z+plane[3];
@@ -173,6 +182,12 @@ void rayTracing(ArrayList figures, float viewerZ, boolean persp) {
             if (t<T) {
               T = t;
               nearestObject = k;
+              triangleNormal[0] = vBC[0];
+              triangleNormal[1] = vBC[1];
+              triangleNormal[2] = vBC[2];
+              triangleCentroid[0] = figure.tTriangleCentroids[l][0];
+              triangleCentroid[1] = figure.tTriangleCentroids[l][1];
+              triangleCentroid[2] = figure.tTriangleCentroids[l][2];
               /*r1 = plane[0]*a.x+plane[1]*a.y+plane[2]*a.z+plane[3];
                r2 = plane[0]*b.x+plane[1]*b.y+plane[2]*b.z+plane[3];
                r3 = plane[0]*c.x+plane[1]*c.y+plane[2]*c.z+plane[3];
@@ -185,6 +200,12 @@ void rayTracing(ArrayList figures, float viewerZ, boolean persp) {
             if (t<T) {
               T = t;
               nearestObject = k;
+              triangleNormal[0] = vBC[0];
+              triangleNormal[1] = vBC[1];
+              triangleNormal[2] = vBC[2];
+              triangleCentroid[0] = figure.tTriangleCentroids[l][0];
+              triangleCentroid[1] = figure.tTriangleCentroids[l][1];
+              triangleCentroid[2] = figure.tTriangleCentroids[l][2];
               /*r1 = plane[0]*a.x+plane[1]*a.y+plane[2]*a.z+plane[3];
                r2 = plane[0]*b.x+plane[1]*b.y+plane[2]*b.z+plane[3];
                r3 = plane[0]*c.x+plane[1]*c.y+plane[2]*c.z+plane[3];
@@ -202,6 +223,44 @@ void rayTracing(ArrayList figures, float viewerZ, boolean persp) {
         //Pintar el píxel con el color apropiado, es decir, el del objeto más cercano
         figure = (Figure)figures.get(nearestObject);
         stroke(figure.colour[0], figure.colour[1], figure.colour[2]);
+        if (options[11]) {
+          double module = sqrt( (float)(triangleNormal[0] * triangleNormal[0] +  
+              triangleNormal[1] * triangleNormal[1] + 
+              triangleNormal[2] * triangleNormal[2]));
+          triangleNormal[0] = triangleNormal[0]/module;
+          triangleNormal[1] = triangleNormal[1]/module;
+          triangleNormal[2] = triangleNormal[2]/module;
+          
+          normalizedLight[0] = light[0] - triangleCentroid[0];
+          normalizedLight[1] = light[1] - triangleCentroid[1];
+          normalizedLight[2] = light[2] - triangleCentroid[2];
+          
+          module = sqrt((float)(normalizedLight[0] * normalizedLight[0] +  
+              normalizedLight[1] * normalizedLight[1] + 
+              normalizedLight[2] * normalizedLight[2]));
+              
+          normalizedLight[0] = normalizedLight[0]/module;
+          normalizedLight[1] = normalizedLight[1]/module;
+          normalizedLight[2] = normalizedLight[2]/module;    
+          //Producto escalar nL
+          double factor = triangleNormal[0]*normalizedLight[0] +
+                          triangleNormal[1]*normalizedLight[1] +
+                          triangleNormal[2]*normalizedLight[2];
+                          
+          if (factor > 1)  factor = 1;
+          if (factor < 0.2) factor = 0.2;
+          int [] col = new int[3];
+          col[0] = (int)(factor*figure.colour[0]+40);
+          if (col[0]>255) col[0] = 255;
+          
+          col[1] = (int)(factor*figure.colour[1]+40);
+          if (col[1]>255) col[1] = 255;
+          
+          col[2] = (int)(factor*figure.colour[2]+40);
+          if (col[2]>255) col[2] = 255;
+          
+          stroke(col[0],col[1],col[2]);               
+        }
         point(i, j);
       }
       /*else {
