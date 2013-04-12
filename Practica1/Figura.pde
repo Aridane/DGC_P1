@@ -2,7 +2,12 @@ class Figure implements Drawable {
   //vertex [] verteces = new vertex[8];
   float [][] verteces = new float[10000][];
   float [][] tVerteces = new float[10000][];
-
+  
+  float limitMinX = MAX_FLOAT;
+  float limitMinY = MAX_FLOAT;
+  float limitMaxX = 0;
+  float limitMaxY = 0;
+  
   int type = 1;
 
   int [][] triangles;
@@ -92,10 +97,11 @@ class Figure implements Drawable {
     tVerteces[nVerteces][3] = 1;
 
     nVerteces = nVerteces + 1;
+    getSquareLimits();
+    println("---------------->  "+limitMinX + " " + limitMaxX + " ");
   }
 
   void closeFigure() {
-    closed = true;
     float x = 0, y = 0;
     if (!revolution) {
       for (int i=0;i<nVerteces;i++) {
@@ -243,7 +249,6 @@ class Figure implements Drawable {
         tNormals[triangleIndex][3] = 1;
 
 
-
         triangleIndex = triangleIndex + 1;
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////        
         triangles[triangleIndex][0] = aux;
@@ -308,6 +313,26 @@ class Figure implements Drawable {
       }
     }
     normalizeNormals();
+    getSquareLimits();
+    closed = true;
+  }
+//Funcion para obtener el cuadrado final.
+  void getSquareLimits(){
+    float x,y;
+    limitMinX = MAX_FLOAT;
+    limitMinY = MAX_FLOAT;
+    limitMaxX = 0;
+    limitMaxY = 0;
+    for (int i=0;i<nVerteces;i++){  
+      x = tVerteces[i][0];
+      y = tVerteces[i][1];
+      if (x < limitMinX) limitMinX = x;
+      if (x > limitMaxX) limitMaxX = x;
+      if (y < limitMinY) limitMinY = y;
+      if (y > limitMaxY) limitMaxY = y;
+    }
+    println("----------------> MinX  "+limitMinX + " MaxX " + limitMaxX + " ");
+    println("----------------> MinY  "+limitMinY + " MaxY " + limitMaxY + " ");
   }
 
   PVector getCentroid() {
@@ -401,6 +426,7 @@ class Figure implements Drawable {
       tVerteces[i][0] = tVerteces[i][0] + width/2.;
       tVerteces[i][1] = tVerteces[i][1] + height/2.;
     }
+    getSquareLimits();
   }
 
   void translate (float x, float y, float z) {
@@ -430,6 +456,7 @@ class Figure implements Drawable {
 
     updateCentroid();
     normalizeNormals();
+    if(closed)getSquareLimits();
   }
 
   void rotateX(float angle0, float iniRotX, float iniRotY) {
@@ -481,6 +508,7 @@ class Figure implements Drawable {
 
     normalizeNormals();
     updateCentroid();
+    if(closed)getSquareLimits();
   }
 
   void rotateY(float angle0, float iniRotX, float iniRotY) {
@@ -532,6 +560,7 @@ class Figure implements Drawable {
 
     updateCentroid();
     normalizeNormals();
+    if(closed)getSquareLimits();
   }
 }
 

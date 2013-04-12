@@ -13,11 +13,11 @@ boolean doom = false;
 
 float k = 800;
 
-int nButtons = 12;
+int nButtons = 14;
 float [][] buttons = new float[nButtons][2];
 boolean [] buttonsPressed = new boolean[nButtons];
 String [] buttonsText = {
-  "Cubo", "Fig", "RotX", "Rev", "Tr", "RotY", "Triangles", "Normals", "Persp", "Rayos", "Del", "Iluminación"
+  "Cubo", "Fig", "RotX", "Rev", "Tr", "RotY", "Triangles", "Normals", "Persp", "Rayos", "Del", "Iluminación", "Suavizado", "TestAreas"
 };
 float buttonWidth = 90;
 float buttonHeight = 20;
@@ -39,10 +39,13 @@ void setup() {
   
   loop();
   Cube cube = null;
-
-  for (int i=0;i<nButtons;i++) {
+  for (int i=0;i<(nButtons/2);i++) {
+    buttons[i][0] = width - 200;
+    buttons[i][1] = 150 + i*buttonHeight + i*20;
+  }
+  for (int i=nButtons/2;i<nButtons;i++) {
     buttons[i][0] = width - 100;
-    buttons[i][1] = 100 + i*buttonHeight + i*20;
+    buttons[i][1] = 150 + (i-nButtons/2)*buttonHeight + (i-nButtons/2)*20;
   }
 }
 
@@ -50,19 +53,32 @@ void setup() {
 void draw() {
   background(128, 128, 128);
   int i = 0, j;
-  for (i=0;i<nButtons;i++) {
+  for (i=0;i<nButtons/2;i++) {
 
     if (buttonsPressed[i]) fill(160, 160, 160);
     else fill(90, 90, 90);     
-    buttons[i][0] = width - 100;
-    buttons[i][1] = 100 + i*buttonHeight + i*20;
+    buttons[i][0] = width - 200;
+    buttons[i][1] = 150 + i*buttonHeight + i*20;
 
     rect(buttons[i][0], buttons[i][1], buttonWidth, buttonHeight);
 
     fill(0);
 
     text(buttonsText[i], buttons[i][0]+15, buttons[i][1]+15, -1);
-  }   
+  }
+  for (i=nButtons/2;i<nButtons;i++) {
+
+    if (buttonsPressed[i]) fill(160, 160, 160);
+    else fill(90, 90, 90);     
+    buttons[i][0] = width - 100;
+    buttons[i][1] = 150 + (i-nButtons/2)*buttonHeight + (i-nButtons/2)*20;
+
+    rect(buttons[i][0], buttons[i][1], buttonWidth, buttonHeight);
+
+    fill(0);
+
+    text(buttonsText[i], buttons[i][0]+15, buttons[i][1]+15, -1);
+  }  
   rect(light[0],light[1],50,50);
   stroke(255, 0, 0);
   line(width/2, height/2, (width/2)+60, height/2);
@@ -76,8 +92,10 @@ void draw() {
     println("A POR LOS RAYOS");
     for (int l = figures.size()-1;l>=0;l--) {
       figure = (Figure)figures.get(l);
+      figure.closed = false;
       figure.translate(0, 0, 0);
-    }
+      figure.closed = true;
+  }
     
     rayTracing(figures, k, buttonsPressed);
     

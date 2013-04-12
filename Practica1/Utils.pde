@@ -46,15 +46,44 @@ double [] add(double [] u, double [] v) {
   return res;
 }
 
-void myLine(float [] v0, float [] v1, boolean p) {
+double module(double [] u) {
+  return (double)sqrt((float)(u[0]*u[0] + u[1]*u[1] + u[2]*u[2]));
+}
 
+double det(double [][] mat) {
+  return (mat[0][0]*mat[1][1]*mat[2][2] +
+    mat[0][1]*mat[1][2]*mat[2][0] +
+    mat[0][2]*mat[1][0]*mat[2][1] -
+    mat[2][0]*mat[1][1]*mat[0][2] -
+    mat[2][1]*mat[1][2]*mat[0][0] -
+    mat[2][2]*mat[1][0]*mat[0][1]);
+}
+
+void myLine(float [] v0, float [] v1, boolean p) {
   float aux0X = v0[0], aux0Y = v0[1], aux1X = v1[0], aux1Y = v1[1];
   line(aux0X, aux0Y, aux1X, aux1Y);
 }
 
 void rayTracing(ArrayList figures, float viewerZ, boolean [] options) {
-  for (int i=0;i<width;i++) {
-    for (int j=0;j<height;j++) {
+
+  Figure checkerFigure = (Figure)figures.get(0);   
+  float xMinLimit = checkerFigure.limitMinX;
+  float yMinLimit = checkerFigure.limitMinY;
+  float xMaxLimit = checkerFigure.limitMaxX;
+  float yMaxLimit = checkerFigure.limitMaxY;
+  for (int counter = 1;counter<figures.size();counter++) {
+    checkerFigure = (Figure)figures.get(counter);
+    if ((checkerFigure.limitMinX < xMinLimit)&&(checkerFigure.limitMinX > 0)) xMinLimit = checkerFigure.limitMinX;
+    if ((checkerFigure.limitMinY < yMinLimit)&&(checkerFigure.limitMinY > 0)) yMinLimit = checkerFigure.limitMinY;
+    if ((checkerFigure.limitMaxX > xMaxLimit)&&(checkerFigure.limitMaxX < width)) xMaxLimit = checkerFigure.limitMaxX;
+    if ((checkerFigure.limitMaxY > yMaxLimit)&&(checkerFigure.limitMaxY < height)) xMaxLimit = checkerFigure.limitMaxY;
+
+  }
+
+  for (float i=xMinLimit;i<xMaxLimit;i++) {
+    if (i > width) continue;
+    for (float j=yMinLimit;j<yMaxLimit;j++) {
+      if (j > height) continue;
       //Para cada pixel X = i, Y = j;
       //Determinar el rayo que va desde el observador
       //p = p0 +t*(x1-x0)
@@ -99,119 +128,168 @@ void rayTracing(ArrayList figures, float viewerZ, boolean [] options) {
           arrayCopyFtD(figure.tVerteces[figure.triangles[l][0]], a, 3);
           arrayCopyFtD(figure.tVerteces[figure.triangles[l][1]], b, 3);
           arrayCopyFtD(figure.tVerteces[figure.triangles[l][2]], c, 3);
-
-          //Calculamos el plano
+          //Test de Áreas
           double [] vBA = sub(a, b);
           double [] vBC = sub(c, b);
           vBC = prodVect(vBC, vBA);
-          plane[0] = vBC[0];//figure.tNormals[l][0]-figure.tTriangleCentroids[l][0];//
-          plane[1] = vBC[1];//figure.tNormals[l][1]-figure.tTriangleCentroids[l][1];//
-          plane[2] = vBC[2];//figure.tNormals[l][2]-figure.tTriangleCentroids[l][2];//
-          plane[3] = -plane[0]*a[0]-
-            plane[1]*a[1]-
-            plane[2]*a[2];
+          if (options[13]) {
+            double la, lb, lc, s, perim, alfa, beta, gamma, A, Aa, Ab, Ac;
+            double [] vCA = sub(a, c);
+           // double [] vBA = sub(a, b);
+            //double [] vBC = sub(c, b);
+            la = module(vBA);
+            lb = module(vBC);
+            lc = module(vCA);
+            perim = la + lb + lc;
+            //Área del triángulo exterior
+            s = perim/2.;
+            A = (double)sqrt((float)(s*(s-la)*(s-lb)*(s-lc)));
+            //Ahora calculamos el área de los triángulos interiores y el test
+            
+            //TODO EL PROBLEMA ESTÁ EN EL TEST DE INCLUSION QUE GENERA LA T
+            
+            
+            double [][] matA = {
+              {
+                b[0]-a[0], c[0]-a[0], inc[0]
+              }
+              , {
+                b[1]-a[1], c[1]-a[1], inc[1]
+              }
+              , {
+                b[2]-a[2], c[2]-a[2], inc[2]
+              }
+            };
+            double [][] matBeta = {
+              {
+                p0[0]-a[0], c[0]-a[0], inc[0]
+              }
+              , {
+                p0[1]-a[1], c[1]-a[1], inc[1]
+              }
+              , {
+                p0[2]-a[2], c[2]-a[2], inc[2]
+              }
+            };
+            double [][] matGamma = {
+              {
+                b[0]-a[0], p0[0]-a[0], inc[0]
+              }
+              , {
+                b[1]-a[1], p0[1]-a[1], inc[1]
+              }
+              , {
+                b[2]-a[2], p0[2]-a[2], inc[2]
+              }
+            };
+            double [][] matT = {
+              {
+                b[0]-a[0], c[0]-a[0], p0[0]-a[0]
+              }
+              , {
+                b[1]-a[1], c[1]-a[1], p0[1]-a[1]
+              }
+              , {
+                b[2]-a[2], c[2]-a[2], p0[2]-a[2]
+              }
+            };
 
-          /*double sA,sB,sC;
-           sA = plane[0]*a[0]+plane[1]*a[1]+plane[2]*a[2]+plane[3];
-           sB = plane[0]*b[0]+plane[1]*b[1]+plane[2]*b[2]+plane[3];
-           sC = plane[0]*c[0]+plane[1]*c[1]+plane[2]*c[2]+plane[3];
-           
-           if((sA !=0)||(sB!=0)||(sC!=0)){
-           println("ERROR " + sA+" "+sB+" "+sC);
-           println("PLANO A = "+plane[0] +"; B = "+plane[1] + "; C = " + plane[2] + "; D = "+ plane[3]);
-           println("Punto a aX = "+a[0]+"; aY = "+a[1]+"; aZ = "+a[2]+";");
-           println("Punto b bX = "+b[0]+"; bY = "+b[1]+"; bZ = "+b[2]+";");
-           println("Punto c cX = "+c[0]+"; cY = "+c[1]+"; cZ = "+c[2]+";");
-           return;
-           }*/
-          /*println("PLANO A = "+plane[0] +"; B = "+plane[1] + "; C = " + plane[2] + "; D = "+ plane[3]);
-           println("Punto a aX = "+a.x+"; aY = "+a.y+"; aZ = "+a.z+";");
-           println("Punto b bX = "+b.x+"; bY = "+b.y+"; bZ = "+b.z+";");
-           println("Punto c cX = "+c.x+"; cY = "+c.y+"; cZ = "+c.z+";");*/
-          //Calculamos la interseccion entre recta y plano
-          t = -((plane[0]*p0[0]+plane[1]*p0[1]+plane[2]*p0[2]+plane[3])/(plane[0]*inc[0]+plane[1]*inc[1]+plane[2]*inc[2]));
-          //Tenemos el punto de intersección (p = p0 + T*inc)
-          p[0] = p0[0] + inc[0]*t;
-          p[1] = p0[1] + inc[1]*t;
-          p[2] = p0[2] + inc[2]*t;
+            beta = det(matBeta)/det(matA);
+            gamma = det(matGamma)/det(matA);
+            t = det(matT)/det(matA);
 
-          //println("Punto p pX = "+p.x+";pY  = "+p.y+";pZ  = "+p.z+";");
-
-
-          double [] auxR1;
-          double [] auxR2;
-          double [] auxR3;
-          double [] auxN;
-          //auxR1 = (b-a)x(p-a)
-          auxR1 = prodVect(sub(b, a), sub(p, a));
-          //auxR2 = (c-b)x(p-b)
-          auxR2 = prodVect(sub(c, b), sub(p, b));
-          //auxR3 = (a-c)x(p-c)
-          auxR3 = prodVect(sub(a, c), sub(p, c));
-          //Copiamos la normal para hacer el producto escalar
-          //vBC contenía la normal
-          double r1, r2, r3;
-          r1 = prodEsc(vBC, auxR1);
-          r2 = prodEsc(vBC, auxR2);
-          r3 = prodEsc(vBC, auxR3);
-
-          if ((r1 == 0)||(r2 == 0)||(r3 == 0))
-
-          {
-            //El punto está dentro
-            //Almacenamos la T para este poligono.
-            if (t<T) {
-              T = t;
-              nearestObject = k;
-              triangleNormal[0] = vBC[0];
-              triangleNormal[1] = vBC[1];
-              triangleNormal[2] = vBC[2];
-              triangleCentroid[0] = figure.tTriangleCentroids[l][0];
-              triangleCentroid[1] = figure.tTriangleCentroids[l][1];
-              triangleCentroid[2] = figure.tTriangleCentroids[l][2];
-              
-              /*  r1 = plane[0]*a.x+plane[1]*a.y+plane[2]*a.z+plane[3];
-               r2 = plane[0]*b.x+plane[1]*b.y+plane[2]*b.z+plane[3];
-               r3 = plane[0]*c.x+plane[1]*c.y+plane[2]*c.z+plane[3];
-               float r4 = plane[0]*p.x+plane[1]*p.y+plane[2]*p.z+plane[3];
-               println("1----r1 "+r1+" r2 "+r2+" r3 "+r3 + " " +r4 + " " +k + " " + (float)(plane[0]*figure.triangleCentroids[l][0]+plane[1]*figure.triangleCentroids[l][1]+plane[2]*figure.triangleCentroids[l][2]+plane[3])); //<>//
-               */
+            if (((gamma+beta)<1) && (gamma>0) && (beta>0)) {
+              if (t<T) {
+                T = t;
+                nearestObject = k;
+                triangleNormal[0] = figure.tNormals[l][0];//vBC[0];
+                triangleNormal[1] = figure.tNormals[l][1];//vBC[1];
+                triangleNormal[2] = figure.tNormals[l][2];//vBC[2];
+                triangleCentroid[0] = figure.tTriangleCentroids[l][0];
+                triangleCentroid[1] = figure.tTriangleCentroids[l][1];
+                triangleCentroid[2] = figure.tTriangleCentroids[l][2];
+                alfa = 1. - beta - gamma;
+                Aa = alfa * A;
+                Ab = beta * A;
+                Ac = gamma * A;
+              }
             }
+
+            //Tenemos el punto de intersección (p = p0 + T*inc)
+           // p[0] = p0[0] + inc[0]*t;
+           // p[1] = p0[1] + inc[1]*t;
+           // p[2] = p0[2] + inc[2]*t;
           }
-          else if ((r1>0)&&(r2>0)&&(r3>0)) {
-            if (t<T) {
-              T = t;
-              nearestObject = k;
-              triangleNormal[0] = vBC[0];
-              triangleNormal[1] = vBC[1];
-              triangleNormal[2] = vBC[2];
-              triangleCentroid[0] = figure.tTriangleCentroids[l][0];
-              triangleCentroid[1] = figure.tTriangleCentroids[l][1];
-              triangleCentroid[2] = figure.tTriangleCentroids[l][2];
-              /*r1 = plane[0]*a.x+plane[1]*a.y+plane[2]*a.z+plane[3];
-               r2 = plane[0]*b.x+plane[1]*b.y+plane[2]*b.z+plane[3];
-               r3 = plane[0]*c.x+plane[1]*c.y+plane[2]*c.z+plane[3];
-               float r4 = plane[0]*p.x+plane[1]*p.y+plane[2]*p.z+plane[3];
-               println("1----r1 "+r1+" r2 "+r2+" r3 "+r3 + " " +r4 + " " +k + " " + (float)(plane[0]*figure.triangleCentroids[l][0]+plane[1]*figure.triangleCentroids[l][1]+plane[2]*figure.triangleCentroids[l][2]+plane[3])); //<>//
-               */
+          //Test de producto vectorial
+          else {
+            //Calculamos el plano
+
+            plane[0] = vBC[0];//figure.tNormals[l][0]-figure.tTriangleCentroids[l][0];//
+            plane[1] = vBC[1];//figure.tNormals[l][1]-figure.tTriangleCentroids[l][1];//
+            plane[2] = vBC[2];//figure.tNormals[l][2]-figure.tTriangleCentroids[l][2];//
+            plane[3] = -plane[0]*a[0]-
+              plane[1]*a[1]-
+              plane[2]*a[2];
+            //Calculamos la interseccion entre recta y plano
+            t = -((plane[0]*p0[0]+plane[1]*p0[1]+plane[2]*p0[2]+plane[3])/(plane[0]*inc[0]+plane[1]*inc[1]+plane[2]*inc[2]));
+            //Tenemos el punto de intersección (p = p0 + T*inc)
+            p[0] = p0[0] + inc[0]*t;
+            p[1] = p0[1] + inc[1]*t;
+            p[2] = p0[2] + inc[2]*t;
+            double [] auxR1;
+            double [] auxR2;
+            double [] auxR3;
+            double [] auxN;
+
+            auxR1 = prodVect(sub(b, a), sub(p, a));
+            auxR2 = prodVect(sub(c, b), sub(p, b));
+            auxR3 = prodVect(sub(a, c), sub(p, c));
+            //Copiamos la normal para hacer el producto escalar
+            //vBC contenía la normal
+            double r1, r2, r3;
+            r1 = prodEsc(vBC, auxR1);
+            r2 = prodEsc(vBC, auxR2);
+            r3 = prodEsc(vBC, auxR3);
+
+            if ((r1 == 0)||(r2 == 0)||(r3 == 0))
+
+            {
+              //El punto está dentro
+              //Almacenamos la T para este poligono.
+              if (t<T) {
+                T = t;
+                nearestObject = k;
+                triangleNormal[0] = vBC[0];
+                triangleNormal[1] = vBC[1];
+                triangleNormal[2] = vBC[2];
+                triangleCentroid[0] = figure.tTriangleCentroids[l][0];
+                triangleCentroid[1] = figure.tTriangleCentroids[l][1];
+                triangleCentroid[2] = figure.tTriangleCentroids[l][2];
+              }
             }
-          }
-          else if ((r1<0)&&(r2<0)&&(r3<0)) {
-            if (t<T) {
-              T = t;
-              nearestObject = k;
-              triangleNormal[0] = vBC[0];
-              triangleNormal[1] = vBC[1];
-              triangleNormal[2] = vBC[2];
-              triangleCentroid[0] = figure.tTriangleCentroids[l][0];
-              triangleCentroid[1] = figure.tTriangleCentroids[l][1];
-              triangleCentroid[2] = figure.tTriangleCentroids[l][2];
-              /*r1 = plane[0]*a.x+plane[1]*a.y+plane[2]*a.z+plane[3];
-               r2 = plane[0]*b.x+plane[1]*b.y+plane[2]*b.z+plane[3];
-               r3 = plane[0]*c.x+plane[1]*c.y+plane[2]*c.z+plane[3];
-               float r4 = plane[0]*p.x+plane[1]*p.y+plane[2]*p.z+plane[3];
-               println("1----r1 "+r1+" r2 "+r2+" r3 "+r3 + " " +r4 + " " +k + " " + (float)(plane[0]*figure.triangleCentroids[l][0]+plane[1]*figure.triangleCentroids[l][1]+plane[2]*figure.triangleCentroids[l][2]+plane[3])); //<>//
-               */
+            else if ((r1>0)&&(r2>0)&&(r3>0)) {
+              if (t<T) {
+                T = t;
+                nearestObject = k;
+                triangleNormal[0] = vBC[0];
+                triangleNormal[1] = vBC[1];
+                triangleNormal[2] = vBC[2];
+                triangleCentroid[0] = figure.tTriangleCentroids[l][0];
+                triangleCentroid[1] = figure.tTriangleCentroids[l][1];
+                triangleCentroid[2] = figure.tTriangleCentroids[l][2];
+              }
+            }
+            else if ((r1<0)&&(r2<0)&&(r3<0)) {
+              if (t<T) {
+                T = t;
+                nearestObject = k;
+                triangleNormal[0] = vBC[0];
+                triangleNormal[1] = vBC[1];
+                triangleNormal[2] = vBC[2];
+                triangleCentroid[0] = figure.tTriangleCentroids[l][0];
+                triangleCentroid[1] = figure.tTriangleCentroids[l][1];
+                triangleCentroid[2] = figure.tTriangleCentroids[l][2];
+              }
             }
           }
         }
@@ -223,44 +301,48 @@ void rayTracing(ArrayList figures, float viewerZ, boolean [] options) {
         //Pintar el píxel con el color apropiado, es decir, el del objeto más cercano
         figure = (Figure)figures.get(nearestObject);
         stroke(figure.colour[0], figure.colour[1], figure.colour[2]);
+        //Iluminación Básica
         if (options[11]) {
           double module = sqrt( (float)(triangleNormal[0] * triangleNormal[0] +  
-              triangleNormal[1] * triangleNormal[1] + 
-              triangleNormal[2] * triangleNormal[2]));
+            triangleNormal[1] * triangleNormal[1] + 
+            triangleNormal[2] * triangleNormal[2]));
           triangleNormal[0] = triangleNormal[0]/module;
           triangleNormal[1] = triangleNormal[1]/module;
           triangleNormal[2] = triangleNormal[2]/module;
-          
+
           normalizedLight[0] = light[0] - triangleCentroid[0];
           normalizedLight[1] = light[1] - triangleCentroid[1];
           normalizedLight[2] = light[2] - triangleCentroid[2];
-          
+
           module = sqrt((float)(normalizedLight[0] * normalizedLight[0] +  
-              normalizedLight[1] * normalizedLight[1] + 
-              normalizedLight[2] * normalizedLight[2]));
-              
+            normalizedLight[1] * normalizedLight[1] + 
+            normalizedLight[2] * normalizedLight[2]));
+
           normalizedLight[0] = normalizedLight[0]/module;
           normalizedLight[1] = normalizedLight[1]/module;
           normalizedLight[2] = normalizedLight[2]/module;    
           //Producto escalar nL
           double factor = triangleNormal[0]*normalizedLight[0] +
-                          triangleNormal[1]*normalizedLight[1] +
-                          triangleNormal[2]*normalizedLight[2];
-                          
+            triangleNormal[1]*normalizedLight[1] +
+            triangleNormal[2]*normalizedLight[2];
+
           if (factor > 1)  factor = 1;
           if (factor < 0.2) factor = 0.2;
           int [] col = new int[3];
           col[0] = (int)(factor*figure.colour[0]+40);
           if (col[0]>255) col[0] = 255;
-          
+
           col[1] = (int)(factor*figure.colour[1]+40);
           if (col[1]>255) col[1] = 255;
-          
+
           col[2] = (int)(factor*figure.colour[2]+40);
           if (col[2]>255) col[2] = 255;
-          
-          stroke(col[0],col[1],col[2]);               
+
+          stroke(col[0], col[1], col[2]);
         }
+        //Iluminación suavizada
+        //else if (options[12] && options[13]) {
+        //}
         point(i, j);
       }
       /*else {
